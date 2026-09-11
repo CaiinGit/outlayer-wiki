@@ -6,42 +6,55 @@
   <meta name="description" content="Codex joueur officiel du JDR Outlayer. Découvrez le monde, les personnages, créatures, lieux et artefacts au fil de la campagne.">
   <meta name="theme-color" content="#0b0a08">
   <title>Outlayer — Codex des joueurs</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="preload" as="image" href="assets/outlayer-landscape.webp" media="(min-width: 721px)">
+  <link rel="preload" as="image" href="assets/outlayer-landscape-mobile.webp" media="(max-width: 720px)">
+  <link rel="stylesheet" href="styles.css?v=hero-2">
 </head>
 <body>
+  <a class="skip-link" href="#codex">Aller au codex</a>
   <header class="topbar">
     <a href="#top" class="brand" aria-label="Outlayer — Accueil">
-      <span class="brand-sigil" aria-hidden="true">O</span>
-      <span class="brand-copy">
-        <strong>OUTLAYER</strong>
-        <small>Codex des joueurs</small>
-      </span>
+      <img src="assets/outlayer-logo.svg" width="282" height="84" alt="Outlayer">
     </a>
 
-    <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false">
+    <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
       <span></span><span></span><span></span>
     </button>
 
-    <nav class="main-nav" aria-label="Navigation principale">
-      <a href="#codex">Codex</a>
-      <a href="#chroniques">Chroniques</a>
-      <a href="#progression">Progression</a>
-      <a href="#apropos">À propos</a>
+    <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
+      <a href="#top" data-section="accueil" aria-current="location">Accueil</a>
+      <a href="#codex" data-section="codex" data-category="Tous">Monde</a>
+      <a href="#chroniques" data-section="chroniques">Histoire</a>
+      <a href="#codex" data-category="Factions">Factions</a>
+      <a href="#codex" data-category="Bestiaire">Bestiaire</a>
+      <a href="#codex" data-category="Lieux">Lieux</a>
+      <a href="#codex" data-category="Artefacts">Objets</a>
     </nav>
+    <div class="nav-actions">
+      <a class="nav-search" href="#searchInput" aria-label="Rechercher dans le codex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg>
+      </a>
+      <a class="nav-codex" href="#codex" data-category="Tous"><span aria-hidden="true">✧</span> Codex</a>
+    </div>
   </header>
 
   <main id="top">
-    <section class="parallax-hero" id="accueil" aria-label="Accueil Outlayer">
+    <section class="parallax-hero" id="accueil" aria-labelledby="heroTitle">
       <div class="parallax-hero-bg" aria-hidden="true"></div>
       <div class="parallax-hero-shade" aria-hidden="true"></div>
       <div class="parallax-hero-content">
-        <p class="parallax-eyebrow">CODEX DES JOUEURS</p>
-        <img class="outlayer-wordmark" src="assets/outlayer-logo.svg" alt="Outlayer">
-        <p class="parallax-subtitle">Le monde ne se révèle qu'à ceux qui l'explorent.</p>
-        <a class="parallax-cta" href="#codex">Entrer dans le codex <span aria-hidden="true">↓</span></a>
+        <h1 id="heroTitle"><img class="outlayer-wordmark" src="assets/outlayer-crest.webp" width="1600" height="800" alt="Outlayer"></h1>
+        <p class="parallax-subtitle">Un monde à découvrir</p>
+        <div class="hero-divider" aria-hidden="true"><span></span>◇<span></span></div>
+        <p class="hero-introduction">Terres fragmentées. Ombres persistantes. Histoires en devenir.<br>Bienvenue dans Outlayer.</p>
       </div>
-      <div class="parallax-scroll" aria-hidden="true">
-        <span></span>
+      <div class="hero-bottom">
+        <p class="hero-motto">Connaître<br>Explorer<br>Comprendre</p>
+        <a class="parallax-cta" href="#codex" data-category="Tous">
+          <span class="explore-chevron" aria-hidden="true"></span>
+          Explorer le codex
+        </a>
+        <p class="hero-motto hero-motto-right">Le monde appartient<br>à ceux qui le découvrent</p>
       </div>
     </section>
 
@@ -56,33 +69,17 @@
       </div>
     </section>
 
-    <section id="progression" class="section progress-section">
-      <div class="section-heading reveal">
-        <p class="kicker">PROGRESSION</p>
-        <h2>Votre connaissance du monde.</h2>
-        <p>
-          Les entrées se dévoilent selon ce que vos personnages savent réellement.
-          Un mystère visible ici n’est pas nécessairement une information accessible en jeu.
-        </p>
-      </div>
-
-      <div class="progress-grid reveal" id="progressGrid" aria-live="polite"></div>
-    </section>
-
     <section id="codex" class="section codex-section">
       <div class="section-heading reveal">
         <p class="kicker">CODEX</p>
         <h2>Archives accessibles.</h2>
-        <p>
-          Recherchez une entrée ou filtrez le codex. Les fiches verrouillées ne
-          contiennent aucun spoiler caché dans le code public.
-        </p>
+        <p>Retrouvez vos découvertes. Les archives encore scellées se dévoileront au fil de votre aventure.</p>
       </div>
 
       <div class="codex-toolbar reveal">
         <label class="search-box">
           <span aria-hidden="true">⌕</span>
-          <input id="searchInput" type="search" placeholder="Rechercher dans le codex…" autocomplete="off">
+          <input id="searchInput" type="search" aria-label="Rechercher dans le codex" placeholder="Rechercher dans le codex…" autocomplete="off">
         </label>
 
         <div class="filter-row" id="categoryFilters" aria-label="Filtrer par catégorie"></div>
@@ -118,6 +115,19 @@
       </div>
     </section>
 
+    <section id="progression" class="section progress-section">
+      <div class="section-heading reveal">
+        <p class="kicker">PROGRESSION</p>
+        <h2>Votre connaissance du monde.</h2>
+        <p>
+          Les entrées se dévoilent selon ce que vos personnages savent réellement.
+          Un mystère visible ici n’est pas nécessairement une information accessible en jeu.
+        </p>
+      </div>
+
+      <div class="progress-grid reveal" id="progressGrid" aria-live="polite"></div>
+    </section>
+
     <section id="chroniques" class="section chronicles-section">
       <div class="section-heading reveal">
         <p class="kicker">CHRONIQUES</p>
@@ -133,26 +143,21 @@
         <article class="chronicle-main reveal">
           <span class="chapter-number">I</span>
           <p class="chronicle-label">EXTRAIT DES ARCHIVES</p>
-          <h3>Les Enclins</h3>
+          <h3>La première page.</h3>
           <p>
-            Il existe des périodes que les royaumes n’évoquent qu’avec prudence.
-            Lorsque les Engeances se rassemblent en nombres impossibles à ignorer,
-            les chroniqueurs parlent d’un Enclin. Les plus anciens récits
-            décrivent alors des armées en marche, des cités condamnées à fermer
-            leurs portes et la Garde des Ombres rappelée à son devoir.
+            Le Noyau est votre seul repère consigné à ce jour.
+            Les récits de vos rencontres et de vos voyages viendront enrichir ces archives.
           </p>
           <p>
-            Tout le monde connaît le mot. Peu prétendent comprendre ce qu’il
-            signifie réellement de voir l’un de ces désastres approcher.
+            Aucune autre chronique n’a encore été révélée.
           </p>
         </article>
 
         <aside class="chronicle-side reveal">
           <blockquote>
-            « Les archives ne disent jamais tout. Elles disent seulement ce que
-            quelqu’un a survécu assez longtemps pour écrire. »
+            « Le monde appartient à ceux qui le découvrent. »
           </blockquote>
-          <span>— Fragment anonyme conservé à Valor</span>
+          <span>Outlayer</span>
         </aside>
       </div>
     </section>
@@ -181,15 +186,16 @@
 
   <footer class="footer">
     <span>OUTLAYER — Codex des joueurs</span>
+    <nav class="footer-nav" aria-label="Informations du codex"><a href="#progression">Progression</a><a href="#apropos">À propos</a></nav>
     <span>Univers de Valentin Brizard · <span id="year"></span></span>
   </footer>
 
-  <dialog class="codex-dialog" id="entryDialog">
+  <dialog class="codex-dialog" id="entryDialog" aria-labelledby="entryTitle">
     <button class="dialog-close" id="dialogClose" aria-label="Fermer">×</button>
     <div id="dialogContent"></div>
   </dialog>
 
   <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=hero-2"></script>
 </body>
 </html>

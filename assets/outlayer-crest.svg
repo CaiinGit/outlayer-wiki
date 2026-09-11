@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" role="img" aria-label="Outlayer">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2=".1" y2="1"><stop stop-color="#fff0b4"/><stop offset=".28" stop-color="#e6b347"/><stop offset=".5" stop-color="#bd7d20"/><stop offset=".76" stop-color="#e5b952"/><stop offset="1" stop-color="#855015"/></linearGradient>
+    <linearGradient id="bronze" x2=".8" y2="1"><stop stop-color="#b38b47"/><stop offset=".45" stop-color="#534125"/><stop offset="1" stop-color="#211d15"/></linearGradient>
+    <filter id="bevel" x="-10%" y="-20%" width="120%" height="150%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.3" result="height"/>
+      <feDiffuseLighting in="height" surfaceScale="6" diffuseConstant="1.3" lighting-color="#ffffff" result="diffuse"><feDistantLight azimuth="235" elevation="50"/></feDiffuseLighting>
+      <feComposite in="diffuse" in2="SourceGraphic" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" result="shaded"/>
+      <feSpecularLighting in="height" surfaceScale="6" specularConstant=".85" specularExponent="15" lighting-color="#fff0b5" result="light"><feDistantLight azimuth="235" elevation="50"/></feSpecularLighting>
+      <feComposite in="light" in2="SourceAlpha" operator="in" result="trimmed"/>
+      <feBlend in="shaded" in2="trimmed" mode="screen" result="metallic"/>
+      <feDropShadow in="metallic" dx="0" dy="2.2" stdDeviation="1.2" flood-color="#040403" flood-opacity=".95"/>
+    </filter>
+  </defs>
+  <g fill="none" stroke="url(#bronze)" opacity=".8">
+    <circle cx="500" cy="223" r="141" stroke-width="10"/>
+    <circle cx="500" cy="223" r="154" stroke-width="2"/>
+    <circle cx="500" cy="223" r="103" stroke-width="3"/>
+    <path d="M500 55V391M331 223H669M381 104L619 342M381 342L619 104" stroke-width="2"/>
+  </g>
+  <g fill="url(#bronze)" stroke="#a28040" stroke-width="1.5" opacity=".85">
+    <path d="M500 15L522 199L500 245L478 199Z M500 469L486 260L500 224L514 260Z M280 223L474 207L500 223L474 239Z M720 223L526 239L500 223L526 207Z"/>
+    <path d="M372 95L492 211L472 218Z M628 95L508 211L528 218Z M372 351L490 235L470 228Z M628 351L510 235L530 228Z"/>
+  </g>
+  <g transform="translate(35 174) scale(3.3)">
+    <path d="M 73 24 L 71 24 L 62 29 L 62 31 L 65 34 L 65 56 L 60 62 L 55 55 L 55 24 L 53 24 L 43 29 L 43 31 L 45 33 L 45 59 L 48 64 L 58 73 L 64 72 L 69 67 L 73 60 Z M 77 23 L 77 35 L 82 32 L 86 33 L 86 66 L 83 71 L 100 71 L 97 66 L 98 32 L 103 32 L 107 34 L 107 23 Z M 187 21 L 184 22 L 175 30 L 175 33 L 178 35 L 178 47 L 193 61 L 197 57 L 198 63 L 193 70 L 179 64 L 180 67 L 193 83 L 197 80 L 207 66 L 207 27 L 209 24 L 198 24 L 198 44 L 194 48 L 192 48 L 187 43 Z M 160 21 L 145 29 L 144 32 L 146 35 L 140 66 L 138 71 L 151 71 L 148 67 L 148 63 L 154 57 L 158 55 L 160 59 L 159 71 L 172 71 L 167 53 L 172 50 L 173 48 L 172 45 L 168 46 L 165 45 L 160 29 Z M 154 39 L 157 48 L 152 52 L 151 47 L 152 42 Z M 260 20 L 243 30 L 242 32 L 248 36 L 248 65 L 245 71 L 259 71 L 257 68 L 258 54 L 263 59 L 263 67 L 266 71 L 275 71 L 275 69 L 273 66 L 272 56 L 273 55 L 272 52 L 266 49 L 272 44 L 277 38 Z M 258 34 L 262 39 L 258 43 Z M 230 20 L 221 25 L 218 28 L 211 32 L 210 34 L 214 35 L 216 37 L 216 67 L 214 71 L 240 71 L 240 60 L 236 63 L 231 64 L 226 63 L 227 51 L 236 52 L 236 44 L 226 43 L 226 34 L 229 31 L 231 31 L 235 35 L 239 34 L 239 31 Z M 112 12 L 117 21 L 117 70 L 116 72 L 109 72 L 109 75 L 112 83 L 157 83 L 157 74 L 155 74 L 149 77 L 135 77 L 130 75 L 130 19 L 134 12 Z M 25 7 L 7 20 L 7 64 L 21 76 L 25 78 L 40 64 L 40 20 Z M 23 20 L 26 20 L 32 25 L 32 60 L 25 66 L 18 61 L 17 25 Z" fill="url(#metal)" fill-rule="evenodd" stroke="#372109" stroke-width=".45" stroke-linejoin="miter" filter="url(#bevel)"/>
+  </g>
+  </svg>

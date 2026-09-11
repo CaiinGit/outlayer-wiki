@@ -2,6 +2,11 @@
 
 Ce dépôt est public et destiné aux joueurs.
 
+État actuel : seul **Le Noyau** est connu. Cette restriction s’applique à `data.js`
+et à tous les textes du site, notamment les chroniques, citations et attributions
+dans `index.html`. Une archive verrouillée ne doit pas être révélée indirectement
+par une autre section de la page.
+
 ## Règle absolue
 
 Un secret MJ ne doit jamais être ajouté au dépôt public puis masqué avec du CSS, du JavaScript, un flou, une classe `hidden` ou un mot de passe côté navigateur.

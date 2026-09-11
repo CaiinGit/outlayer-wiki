@@ -39,14 +39,35 @@ function buildCategoryFilters() {
     button.textContent = category;
     button.dataset.category = category;
     button.classList.toggle("active", category === activeCategory);
-    button.addEventListener("click", () => {
-      activeCategory = category;
-      document.querySelectorAll(".filter-button").forEach((el) => {
-        el.classList.toggle("active", el.dataset.category === category);
-      });
-      render();
-    });
+    button.setAttribute("aria-pressed", String(category === activeCategory));
+    button.addEventListener("click", () => selectCategory(category));
     categoryFilters.appendChild(button);
+  });
+}
+
+function selectCategory(category, reset = false) {
+  if (!categories.includes(category)) return;
+  activeCategory = category;
+  if (reset) {
+    searchInput.value = "";
+    statusSelect.value = "all";
+  }
+  categoryFilters.querySelectorAll(".filter-button").forEach((button) => {
+    const active = button.dataset.category === category;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  render();
+  setCurrentNavigation("codex");
+}
+
+function setCurrentNavigation(section) {
+  mainNav.querySelectorAll("a").forEach((link) => {
+    const current = section === "codex"
+      ? link.dataset.category === activeCategory
+      : link.dataset.section === section;
+    if (current) link.setAttribute("aria-current", "location");
+    else link.removeAttribute("aria-current");
   });
 }
 
@@ -147,7 +168,7 @@ function openEntry(id) {
     <div class="dialog-hero status-${entry.status}">
       <span class="dialog-symbol" aria-hidden="true">${entry.symbol || "?"}</span>
       <p class="dialog-category">${entry.category} · ${meta.label}</p>
-      <h2>${entry.title}</h2>
+      <h2 id="entryTitle">${entry.title}</h2>
       <p class="dialog-subtitle">${entry.subtitle}</p>
     </div>
     <div class="dialog-body">
@@ -190,23 +211,12 @@ function buildProgress() {
     progressGrid.appendChild(card);
   });
 
-  const unlockedAll = entries.filter((entry) => entry.status !== "locked").length;
-  const lockedAll = entries.filter((entry) => entry.status === "locked").length;
-  document.getElementById("heroDiscovered").textContent = unlockedAll;
-  document.getElementById("heroLocked").textContent = lockedAll;
 }
 
-function setupReveal() {
-  const observer = new IntersectionObserver((records) => {
-    records.forEach((record) => {
-      if (record.isIntersecting) {
-        record.target.classList.add("visible");
-        observer.unobserve(record.target);
-      }
-    });
-  }, { threshold: 0.12 });
-
-  document.querySelectorAll(".reveal").forEach((element) => observer.observe(element));
+function closeMenu() {
+  mainNav.classList.remove("open");
+  menuToggle.setAttribute("aria-expanded", "false");
+  menuToggle.setAttribute("aria-label", "Ouvrir le menu");
 }
 
 searchInput.addEventListener("input", render);
@@ -227,70 +237,127 @@ dialog.addEventListener("click", (event) => {
 menuToggle.addEventListener("click", () => {
   const open = mainNav.classList.toggle("open");
   menuToggle.setAttribute("aria-expanded", String(open));
+  menuToggle.setAttribute("aria-label", open ? "Fermer le menu" : "Ouvrir le menu");
 });
 
-mainNav.querySelectorAll("a").forEach((link) => {
+document.querySelectorAll("a[data-category]").forEach((link) => {
+  link.addEventListener("click", () => selectCategory(link.dataset.category, true));
+});
+
+document.querySelectorAll('.topbar a, .parallax-cta').forEach((link) => {
   link.addEventListener("click", () => {
-    mainNav.classList.remove("open");
-    menuToggle.setAttribute("aria-expanded", "false");
+    closeMenu();
+    if (link.dataset.section) setCurrentNavigation(link.dataset.section);
   });
 });
+
+document.querySelector(".nav-search").addEventListener("click", () => {
+  selectCategory("Tous", true);
+  searchInput.focus({ preventScroll: true });
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && mainNav.classList.contains("open")) {
+    closeMenu();
+    menuToggle.focus();
+  }
+});
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".topbar")) closeMenu();
+});
+document.querySelector(".topbar").addEventListener("focusout", (event) => {
+  if (!event.currentTarget.contains(event.relatedTarget)) closeMenu();
+});
+window.matchMedia("(max-width: 1080px)").addEventListener("change", closeMenu);
+
+// Account for a taller navigation bar when users enlarge their text.
+new ResizeObserver(([record]) => {
+  const height = record.borderBoxSize[0]?.blockSize ?? record.target.getBoundingClientRect().height;
+  document.documentElement.style.setProperty("--header-size", `${height}px`);
+}).observe(document.querySelector(".topbar"));
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
 buildCategoryFilters();
 buildProgress();
 render();
-setupReveal();
-
-
 function setupHeroParallax() {
   const hero = document.querySelector(".parallax-hero");
   const bg = document.querySelector(".parallax-hero-bg");
-  const content = document.querySelector(".parallax-hero-content");
-
-  if (!hero || !bg || !content) return;
+  if (!hero || !bg) return;
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const smallScreen = window.matchMedia("(max-width: 720px)");
+  const coarsePointer = window.matchMedia("(pointer: coarse)");
+  let frame = 0;
+  let visible = false;
+  let listening = false;
+  let heroTop = 0;
+  let heroHeight = 0;
+  let previousOffset = -1;
 
-  let ticking = false;
+  function measure() {
+    const rect = hero.getBoundingClientRect();
+    heroTop = rect.top + window.scrollY;
+    heroHeight = rect.height;
+    requestUpdate();
+  }
 
   function update() {
-    ticking = false;
-
-    if (reduceMotion.matches || smallScreen.matches) {
-      hero.style.setProperty("--parallax-y", "0px");
-      hero.style.setProperty("--content-parallax-y", "0px");
-      return;
-    }
-
-    const rect = hero.getBoundingClientRect();
-    const viewport = window.innerHeight;
-
-    if (rect.bottom < 0 || rect.top > viewport) return;
-
-    const travelled = Math.max(0, -rect.top);
-    const bgOffset = Math.min(58, travelled * 0.16);
-    const contentOffset = Math.min(24, travelled * 0.055);
-
-    hero.style.setProperty("--parallax-y", bgOffset + "px");
-    hero.style.setProperty("--content-parallax-y", contentOffset + "px");
+    frame = 0;
+    if (!listening) return;
+    const travelled = Math.max(0, Math.min(heroHeight, window.scrollY - heroTop));
+    const offset = Math.round(Math.min(58, travelled * 0.12) * 100) / 100;
+    if (offset === previousOffset) return;
+    // Only the composited background moves. No layout reads or inherited CSS writes per frame.
+    bg.style.transform = `translate3d(0, ${offset}px, 0)`;
+    previousOffset = offset;
   }
 
   function requestUpdate() {
-    if (!ticking) {
-      window.requestAnimationFrame(update);
-      ticking = true;
-    }
+    if (listening && !frame) frame = window.requestAnimationFrame(update);
   }
 
-  window.addEventListener("scroll", requestUpdate, { passive: true });
-  window.addEventListener("resize", requestUpdate);
-  reduceMotion.addEventListener?.("change", requestUpdate);
-  smallScreen.addEventListener?.("change", requestUpdate);
+  function syncMotion() {
+    const allowed = !reduceMotion.matches && !smallScreen.matches && !coarsePointer.matches;
+    const enabled = allowed && visible && !document.hidden;
+    if (enabled !== listening) {
+      listening = enabled;
+      if (enabled) window.addEventListener("scroll", requestUpdate, { passive: true });
+      else window.removeEventListener("scroll", requestUpdate);
+    }
+    if (!enabled && frame) {
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+    }
+    bg.style.willChange = enabled ? "transform" : "auto";
+    if (!allowed) {
+      bg.style.removeProperty("transform");
+      previousOffset = -1;
+    }
+    if (enabled) measure();
+  }
 
-  update();
+  const observer = new IntersectionObserver(([record]) => {
+    visible = record.isIntersecting;
+    syncMotion();
+  });
+  observer.observe(hero);
+  new ResizeObserver(measure).observe(hero);
+  window.addEventListener("resize", measure, { passive: true });
+  window.addEventListener("pageshow", syncMotion);
+  document.addEventListener("visibilitychange", syncMotion);
+  [reduceMotion, smallScreen, coarsePointer].forEach((query) => query.addEventListener("change", syncMotion));
+}
+
+function setupNavigationTracking() {
+  const observer = new IntersectionObserver((records) => {
+    records.forEach((record) => {
+      if (record.isIntersecting) setCurrentNavigation(record.target.id);
+    });
+  }, { rootMargin: "-15% 0px -70% 0px" });
+  document.querySelectorAll("main > section[id]").forEach((section) => observer.observe(section));
 }
 
 setupHeroParallax();
+setupNavigationTracking();
