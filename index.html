@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Codex joueur officiel du JDR Outlayer. Découvrez le monde, les personnages, créatures, lieux et artefacts au fil de la campagne.">
+  <meta name="theme-color" content="#0b0a08">
+  <title>Outlayer — Codex des joueurs</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a href="#top" class="brand" aria-label="Outlayer — Accueil">
+      <span class="brand-sigil" aria-hidden="true">O</span>
+      <span class="brand-copy">
+        <strong>OUTLAYER</strong>
+        <small>Codex des joueurs</small>
+      </span>
+    </a>
+
+    <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a href="#codex">Codex</a>
+      <a href="#chroniques">Chroniques</a>
+      <a href="#progression">Progression</a>
+      <a href="#apropos">À propos</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+      <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+
+      <div class="hero-copy reveal">
+        <p class="kicker">ARCHIVES DU NOYAU</p>
+        <h1>
+          Tout ce que vous
+          <span>avez découvert</span>
+          mérite d’être consigné.
+        </h1>
+        <p class="hero-lead">
+          Outlayer est un monde de légendes, de guerres anciennes et de vérités
+          encore enfouies. Ce codex évolue avec votre campagne : chaque
+          rencontre peut révéler un visage, un lieu, une créature ou un secret
+          jusque-là inaccessible.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#codex">Ouvrir le codex</a>
+          <a class="button secondary" href="#chroniques">Lire les chroniques</a>
+        </div>
+      </div>
+
+      <aside class="hero-card reveal" aria-label="État de la campagne">
+        <div class="hero-card-top">
+          <span>CODEX // SESSION ACTIVE</span>
+          <span class="live-dot">EN COURS</span>
+        </div>
+        <div class="campaign-glyph" aria-hidden="true">
+          <span class="ring ring-a"></span>
+          <span class="ring ring-b"></span>
+          <span class="glyph-core">✦</span>
+        </div>
+        <div class="campaign-stats">
+          <div>
+            <strong id="heroDiscovered">0</strong>
+            <span>découvertes</span>
+          </div>
+          <div>
+            <strong id="heroLocked">0</strong>
+            <span>mystères</span>
+          </div>
+        </div>
+        <p>
+          Certaines archives resteront volontairement obscures jusqu’à ce que
+          vos personnages les rencontrent en jeu.
+        </p>
+      </aside>
+    </section>
+
+    <section id="progression" class="section progress-section">
+      <div class="section-heading reveal">
+        <p class="kicker">PROGRESSION</p>
+        <h2>Votre connaissance du monde.</h2>
+        <p>
+          Les entrées se dévoilent selon ce que vos personnages savent réellement.
+          Un mystère visible ici n’est pas nécessairement une information accessible en jeu.
+        </p>
+      </div>
+
+      <div class="progress-grid reveal" id="progressGrid" aria-live="polite"></div>
+    </section>
+
+    <section id="codex" class="section codex-section">
+      <div class="section-heading reveal">
+        <p class="kicker">CODEX</p>
+        <h2>Archives accessibles.</h2>
+        <p>
+          Recherchez une entrée ou filtrez le codex. Les fiches verrouillées ne
+          contiennent aucun spoiler caché dans le code public.
+        </p>
+      </div>
+
+      <div class="codex-toolbar reveal">
+        <label class="search-box">
+          <span aria-hidden="true">⌕</span>
+          <input id="searchInput" type="search" placeholder="Rechercher dans le codex…" autocomplete="off">
+        </label>
+
+        <div class="filter-row" id="categoryFilters" aria-label="Filtrer par catégorie"></div>
+
+        <div class="status-filter">
+          <label for="statusSelect">État</label>
+          <select id="statusSelect">
+            <option value="all">Tous</option>
+            <option value="known">Connu</option>
+            <option value="discovered">Découvert</option>
+            <option value="glimpsed">Entrevue</option>
+            <option value="locked">Inconnu</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="results-meta reveal">
+        <span id="resultCount">0 entrée</span>
+        <span class="legend">
+          <i class="legend-dot known"></i> connu
+          <i class="legend-dot discovered"></i> découvert
+          <i class="legend-dot glimpsed"></i> entrevu
+          <i class="legend-dot locked"></i> inconnu
+        </span>
+      </div>
+
+      <div class="codex-grid" id="codexGrid" aria-live="polite"></div>
+
+      <div class="empty-state" id="emptyState" hidden>
+        <span>∅</span>
+        <h3>Aucune archive trouvée.</h3>
+        <p>Essayez un autre mot-clé ou retirez certains filtres.</p>
+      </div>
+    </section>
+
+    <section id="chroniques" class="section chronicles-section">
+      <div class="section-heading reveal">
+        <p class="kicker">CHRONIQUES</p>
+        <h2>Ce que le monde raconte.</h2>
+        <p>
+          Ces textes représentent une connaissance publique ou acquise par les
+          personnages. Ils ne révèlent pas les vérités réservées au maître du jeu.
+        </p>
+      </div>
+
+      <div class="chronicle-layout">
+        <article class="chronicle-main reveal">
+          <span class="chapter-number">I</span>
+          <p class="chronicle-label">EXTRAIT DES ARCHIVES</p>
+          <h3>Les Enclins</h3>
+          <p>
+            Il existe des périodes que les royaumes n’évoquent qu’avec prudence.
+            Lorsque les Engeances se rassemblent en nombres impossibles à ignorer,
+            les chroniqueurs parlent d’un Enclin. Les plus anciens récits
+            décrivent alors des armées en marche, des cités condamnées à fermer
+            leurs portes et la Garde des Ombres rappelée à son devoir.
+          </p>
+          <p>
+            Tout le monde connaît le mot. Peu prétendent comprendre ce qu’il
+            signifie réellement de voir l’un de ces désastres approcher.
+          </p>
+        </article>
+
+        <aside class="chronicle-side reveal">
+          <blockquote>
+            « Les archives ne disent jamais tout. Elles disent seulement ce que
+            quelqu’un a survécu assez longtemps pour écrire. »
+          </blockquote>
+          <span>— Fragment anonyme conservé à Valor</span>
+        </aside>
+      </div>
+    </section>
+
+    <section id="apropos" class="section about-section">
+      <div class="about-panel reveal">
+        <div>
+          <p class="kicker">À PROPOS</p>
+          <h2>Un codex vivant, pas une encyclopédie omnisciente.</h2>
+        </div>
+        <div class="about-copy">
+          <p>
+            Ce site est destiné aux joueurs d’Outlayer. Son contenu évolue avec
+            la campagne et reflète uniquement les connaissances accessibles aux
+            personnages.
+          </p>
+          <p>
+            Les éléments verrouillés sont de véritables teasers : leur contenu
+            secret n’est pas présent dans le dépôt public. Lorsqu’une découverte
+            a lieu en jeu, la fiche peut être enrichie et débloquée.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>OUTLAYER — Codex des joueurs</span>
+    <span>Univers de Valentin Brizard · <span id="year"></span></span>
+  </footer>
+
+  <dialog class="codex-dialog" id="entryDialog">
+    <button class="dialog-close" id="dialogClose" aria-label="Fermer">×</button>
+    <div id="dialogContent"></div>
+  </dialog>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
