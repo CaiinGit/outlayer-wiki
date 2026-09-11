@@ -64,3 +64,12 @@ Le site sera mis à jour sans redémarrer Nginx puisque les fichiers sont monté
 ## Contenu MJ
 
 Les notes MJ, vérités du lore, statistiques secrètes, événements futurs et solutions d'énigmes doivent rester dans une source privée distincte.
+
+
+## Sources narratives exclues du wiki
+
+L'histoire annexe centrée sur **Serge** n'est pas une source de contenu pour le wiki joueur.
+
+Elle peut développer ou illustrer le lore, mais ses scènes, dialogues, rencontres, descriptions narratives et informations propres à cette histoire ne doivent pas être transférés automatiquement dans le codex.
+
+Pour ajouter une information au wiki, elle doit appartenir au lore principal validé ou avoir été découverte pendant la campagne principale.
