@@ -1,10 +1,18 @@
 /*
   OUTLAYER — Données publiques du codex joueur
 
+  IMPORTANT — SOURCES :
+  Ce wiki ne reprend PAS les informations propres à l'histoire annexe de Serge.
+  Cette histoire peut développer l'univers, mais son contenu narratif, ses scènes,
+  ses rencontres et ses détails spécifiques ne sont pas une source pour le codex joueur.
+
+  N'ajouter ici que :
+  1. le lore principal d'Outlayer validé pour les joueurs ;
+  2. les informations réellement apprises pendant la campagne ;
+  3. des teasers sans spoiler pour les éléments non découverts.
+
   RÈGLE DE SÉCURITÉ :
   Ne jamais ajouter ici un vrai secret MJ en le "cachant" avec du CSS ou du JS.
-  Une entrée locked/glimpsed doit seulement contenir ce que les joueurs peuvent
-  réellement voir ou savoir à ce stade de la campagne.
 
   États :
   - locked      : inconnu, teaser minimal
@@ -15,20 +23,32 @@
 
 window.OUTLAYER_ENTRIES = [
   {
+    id: "noyau",
+    category: "Lieux",
+    status: "known",
+    title: "Le Noyau",
+    subtitle: "Le monde connu",
+    symbol: "◉",
+    teaser: "Le monde dans lequel prennent place les chroniques d’Outlayer.",
+    summary: "Le Noyau est le cadre principal du monde connu des personnages.",
+    details: [
+      "Ses terres rassemblent différents peuples, cités, croyances et territoires.",
+      "Le codex n’affiche que les régions dont l’existence est connue des joueurs."
+    ],
+    tags: ["monde", "géographie"],
+    discoveredLabel: "Connu"
+  },
+  {
     id: "valor",
     category: "Lieux",
     status: "known",
     title: "Valor",
-    subtitle: "La capitale blanche",
+    subtitle: "Capitale du Noyau",
     symbol: "V",
-    teaser: "Une cité claire aux grandes avenues, dominée par le Château Blanc.",
-    summary: "Valor est l’une des cités les plus connues du Noyau. Ses avenues, ses ateliers et ses marchés attirent voyageurs, artisans et membres de la Garde des Ombres.",
-    details: [
-      "La ville est reconnaissable à son architecture claire et à la silhouette du Château Blanc.",
-      "Ses rues commerçantes accueillent de nombreux ateliers, tandis que ses grandes places servent de points de rassemblement.",
-      "La présence de la Garde des Ombres y est familière."
-    ],
-    tags: ["capitale", "cité", "garde des ombres"],
+    teaser: "Une capitale majeure du monde connu.",
+    summary: "Valor est une capitale importante du Noyau et un repère connu dans l’univers d’Outlayer.",
+    details: [],
+    tags: ["capitale", "cité"],
     discoveredLabel: "Connu"
   },
   {
@@ -36,14 +56,12 @@ window.OUTLAYER_ENTRIES = [
     category: "Factions",
     status: "known",
     title: "Garde des Ombres",
-    subtitle: "Ordre voué à la lutte contre les Engeances",
+    subtitle: "Ordre combattant les Engeances",
     symbol: "G",
-    teaser: "Un ordre ancien dont le nom accompagne chaque récit d’Enclin.",
-    summary: "La Garde des Ombres combat les Engeances et intervient lorsque leur menace dépasse les capacités des forces ordinaires.",
+    teaser: "Un ordre ancien associé à la lutte contre les Engeances et aux périodes d’Enclin.",
+    summary: "La Garde des Ombres est un ordre voué à la lutte contre les Engeances.",
     details: [
-      "Ses membres bénéficient de privilèges particuliers mais acceptent en retour des risques considérables.",
-      "Le Droit de Conscription permet à la Garde de recruter lorsqu’elle l’estime nécessaire.",
-      "Blessures, mutilations et mort font partie des risques ouvertement associés à l’engagement."
+      "Son rôle devient particulièrement important lorsque survient un Enclin."
     ],
     tags: ["ordre", "engeance", "enclin"],
     discoveredLabel: "Connu"
@@ -55,13 +73,12 @@ window.OUTLAYER_ENTRIES = [
     title: "Solara",
     subtitle: "Déesse du Soleil",
     symbol: "☼",
-    teaser: "Son nom appartient aux prières, aux récits anciens et à la mémoire de la Guerre Solaire.",
-    summary: "Solara est associée au Soleil et occupe une place majeure dans les traditions et les récits du monde.",
+    teaser: "Une divinité majeure associée au Soleil et à une histoire ancienne du monde.",
+    summary: "Solara est connue comme la Déesse du Soleil.",
     details: [
-      "Son culte et son influence appartiennent à l’histoire connue de nombreuses populations.",
-      "De nombreux récits anciens évoquent ses dons, ses symboles ou les traces laissées par son intervention."
+      "Son nom est lié à la Guerre Solaire dans l’histoire connue d’Outlayer."
     ],
-    tags: ["soleil", "déesse", "religion"],
+    tags: ["soleil", "déesse", "guerre solaire"],
     discoveredLabel: "Connu"
   },
   {
@@ -71,11 +88,10 @@ window.OUTLAYER_ENTRIES = [
     title: "Engeances",
     subtitle: "Créatures corrompues",
     symbol: "✧",
-    teaser: "Une menace dont les apparitions accompagnent les heures les plus sombres.",
-    summary: "Les Engeances sont des créatures corrompues connues pour se rassembler en hordes lors des Enclins.",
+    teaser: "Des créatures corrompues dont les hordes sont associées aux Enclins.",
+    summary: "Les Engeances constituent l’une des grandes menaces connues du monde.",
     details: [
-      "Leur nombre et leur violence en font une menace militaire autant qu’une terreur populaire.",
-      "Les récits d’Enclin associent presque toujours leur progression à l’intervention de la Garde des Ombres."
+      "Lors d’un Enclin, elles peuvent se rassembler en hordes sous la menace d’un Archidémon."
     ],
     tags: ["créature", "corruption", "enclin"],
     discoveredLabel: "Connu"
@@ -83,35 +99,15 @@ window.OUTLAYER_ENTRIES = [
   {
     id: "lanvara",
     category: "Lieux",
-    status: "discovered",
+    status: "known",
     title: "Lanvara",
-    subtitle: "Les falaises au-delà de Valor",
+    subtitle: "Région de falaises",
     symbol: "Λ",
-    teaser: "Un territoire dont le nom marque déjà une frontière dans les récits.",
-    summary: "La Lanvara désigne une région de falaises et d’horizons abrupts, connue des voyageurs quittant les terres familières de Valor.",
-    details: [
-      "Ses reliefs imposants participent à sa réputation.",
-      "Pour beaucoup, franchir la Lanvara revient à quitter le confort des routes connues."
-    ],
-    tags: ["falaises", "région", "voyage"],
-    discoveredLabel: "Découvert"
-  },
-  {
-    id: "reminthor",
-    category: "Personnages",
-    status: "discovered",
-    title: "Reminthor",
-    subtitle: "Le dragon azur",
-    symbol: "R",
-    teaser: "Un immense dragon bleu azur dont le retour suffit à faire taire une place entière.",
-    summary: "Reminthor est un dragon ancien, reconnaissable à ses écailles bleu azur et à leurs reflets d’or.",
-    details: [
-      "Sa présence inspire un respect presque immédiat parmi ceux qui le reconnaissent.",
-      "Les récits publics le présentent comme un ancien protecteur lié à l’histoire de Valor.",
-      "Son existence est associée, dans la tradition, à un don de Solara."
-    ],
-    tags: ["dragon", "valor", "solara"],
-    discoveredLabel: "Découvert"
+    teaser: "Une région du monde connue pour ses falaises.",
+    summary: "La Lanvara fait partie de la géographie connue d’Outlayer.",
+    details: [],
+    tags: ["falaises", "région"],
+    discoveredLabel: "Connu"
   },
 
   /* Teasers sûrs : aucune information secrète réelle n’est présente ici. */
@@ -122,7 +118,7 @@ window.OUTLAYER_ENTRIES = [
     title: "???",
     subtitle: "Identité inconnue",
     symbol: "?",
-    teaser: "Une silhouette demeure absente des chroniques accessibles.",
+    teaser: "Une présence n’a pas encore été identifiée.",
     summary: "",
     details: [],
     tags: ["inconnu"],
@@ -135,7 +131,7 @@ window.OUTLAYER_ENTRIES = [
     title: "???",
     subtitle: "Créature inconnue",
     symbol: "?",
-    teaser: "Quelque chose existe au-delà de ce que le codex peut encore nommer.",
+    teaser: "Une créature reste hors de portée des connaissances du groupe.",
     summary: "",
     details: [],
     tags: ["inconnu"],
@@ -144,15 +140,15 @@ window.OUTLAYER_ENTRIES = [
   {
     id: "unknown-artifact-01",
     category: "Artefacts",
-    status: "glimpsed",
+    status: "locked",
     title: "???",
-    subtitle: "Objet entrevu",
+    subtitle: "Artefact inconnu",
     symbol: "◇",
-    teaser: "Un objet a été aperçu, mais sa nature reste indéterminée.",
-    summary: "Le groupe sait seulement qu’un objet d’importance existe. Rien de plus n’est confirmé.",
+    teaser: "Une archive scellée attend encore d’être révélée.",
+    summary: "",
     details: [],
-    tags: ["objet", "mystère"],
-    discoveredLabel: "Entrevue"
+    tags: ["inconnu"],
+    discoveredLabel: "Inconnu"
   },
   {
     id: "unknown-place-01",
@@ -161,7 +157,7 @@ window.OUTLAYER_ENTRIES = [
     title: "???",
     subtitle: "Lieu non découvert",
     symbol: "?",
-    teaser: "Une destination existe sur les marges du savoir accessible.",
+    teaser: "Une partie du monde reste encore inconnue.",
     summary: "",
     details: [],
     tags: ["inconnu"],
@@ -172,9 +168,9 @@ window.OUTLAYER_ENTRIES = [
     category: "Factions",
     status: "locked",
     title: "???",
-    subtitle: "Affiliation inconnue",
+    subtitle: "Faction inconnue",
     symbol: "?",
-    teaser: "Un emblème n’a pas encore livré son nom.",
+    teaser: "Un groupe demeure absent des connaissances actuelles.",
     summary: "",
     details: [],
     tags: ["inconnu"],
