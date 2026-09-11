@@ -834,8 +834,35 @@ h1 span {
 .menu-toggle { display: none; width: 44px; height: 44px; padding: 10px; background: transparent; border: 1px solid var(--gold-dim); cursor: pointer; }
 .menu-toggle span { display: block; height: 1px; margin: 5px 0; background: var(--gold-bright); }
 .parallax-hero { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-rows: 1fr auto; min-height: max(600px, calc(100svh - var(--header-size, var(--header-height)))); background: #282a28; }
-.parallax-hero-bg { position: absolute; inset: -72px -5px; z-index: -3; }
-.parallax-hero-bg::before { content: ''; position: absolute; inset: 0; background: url('assets/outlayer-landscape.webp') center center / cover no-repeat; filter: blur(1.5px); }
+.parallax-hero-bg {
+  position: absolute;
+  inset: -40px 0;
+  z-index: -3;
+  background: url('assets/outlayer-landscape-soft.webp') center / cover no-repeat;
+}
+
+/* Static by default. Supporting browsers can move this single, unfiltered layer
+   on the compositor without a JavaScript scroll handler or animation loop. */
+@supports (animation-timeline: view()) and (animation-range: exit) {
+  @media (min-width: 721px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .parallax-hero {
+      view-timeline-name: --hero-scroll;
+      view-timeline-axis: block;
+      view-timeline-inset: 0;
+    }
+    .parallax-hero-bg {
+      will-change: transform;
+      animation: hero-drift 1s linear both;
+      animation-timeline: --hero-scroll;
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+
+@keyframes hero-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, 32px, 0); }
+}
 .parallax-hero-shade { position: absolute; inset: 0; z-index: -2; background: radial-gradient(ellipse at 50% 42%, transparent 12%, rgba(5,6,6,.1) 55%, rgba(5,6,6,.36)), linear-gradient(180deg, rgba(6,7,8,.08) 30%, rgba(6,7,8,.14) 70%, #0a0907); }
 .parallax-hero-content { align-self: center; justify-self: center; width: min(100% - 40px, 960px); padding: 16px 0 24px; text-align: center; }
 .parallax-hero-content h1 { max-width: none; margin: 0 auto 4px; font-size: inherit; line-height: 1; }
@@ -898,8 +925,7 @@ h1 span {
   .nav-codex { min-height: 38px; padding: 0 10px; font-size: .75rem; letter-spacing: .08em; }
   .nav-codex span, .nav-search { display: none; }
   .parallax-hero { min-height: max(520px, calc(100svh - var(--header-size, var(--header-height)))); }
-  .parallax-hero-bg { inset: -4px; }
-  .parallax-hero-bg::before { background-image: url('assets/outlayer-landscape-mobile.webp'); background-position: 58% center; }
+  .parallax-hero-bg { inset: 0; background-image: url('assets/outlayer-landscape-mobile-soft.webp'); background-position: 58% center; }
   .parallax-hero-content { width: calc(100% - 36px); padding: 50px 0 65px; }
   .outlayer-wordmark { width: min(500px, 92vw); }
   .parallax-subtitle { font-size: 1rem; letter-spacing: .18em; margin-top: 22px; }

@@ -10,9 +10,11 @@ restent scellées.
 
 ## Visuels
 
-- `assets/outlayer-landscape.webp` : paysage de 1983 × 793 pixels.
-- `assets/outlayer-landscape-mobile.webp` : variante légère de 1100 pixels de large,
+- `assets/outlayer-landscape-soft.webp` : décor flouté exporté, 1983 × 793 pixels.
+- `assets/outlayer-landscape-mobile-soft.webp` : variante légère de 1100 pixels de large,
   chargée seule sur les écrans de 720 pixels ou moins.
+- Les versions `outlayer-landscape.webp` et `outlayer-landscape-mobile.webp` sont
+  conservées comme sources ; la page charge uniquement les versions `soft`.
 - `assets/outlayer-crest.svg` : source de l’emblème, utilisant les tracés du logo
   Outlayer existant, une rose des vents géométrique et un relief doré.
 - `assets/outlayer-crest.webp` : rendu transparent de cet emblème, 1600 × 800 pixels.
@@ -28,15 +30,24 @@ fantasy douce aux tons pierre, charbon et or ancien, sans texte ni nouvelle inte
 
 ## Défilement
 
-Le flou CSS est constant et porté par un sous-élément du décor. Seul le conteneur de
-ce décor est déplacé avec `transform`, au maximum de 58 pixels. Le logo et les textes
-défilent normalement. Il n’y a ni boucle d’animation permanente ni lecture de géométrie
-à chaque frame : les dimensions sont mémorisées lors des redimensionnements.
+Le décor flouté est exporté une fois à partir du rendu CSS existant. La page n’applique
+plus de `filter: blur()` à une surface plein écran et n’utilise plus de pseudo-élément
+intermédiaire pour le fond. Les fichiers affichés pèsent environ 85 Kio sur ordinateur
+et 33 Kio sur mobile.
 
-L’écoute du scroll et `will-change` sont activés uniquement lorsque le hero est visible
-et la page active. Le parallaxe est désactivé sur petit écran, avec un pointeur tactile
-et lorsque `prefers-reduced-motion: reduce` est demandé. Les hauteurs réelles des sections
-sont conservées pour éviter les sauts d’ancre liés aux hauteurs estimées.
+Le parallaxe utilise `animation-timeline` et la plage `exit` du hero : seul le fond est
+déplacé de 0 à 32 pixels. Il n’y a aucun gestionnaire JavaScript de scroll, aucune boucle
+`requestAnimationFrame` et aucune écriture de style JavaScript pendant le mouvement.
+Le logo et les textes défilent normalement. Le navigateur prépare une seule couche
+mobile via `will-change: transform` lorsque le parallaxe est applicable.
+
+Le mouvement dépend uniquement de la position du défilement : il reste stable au repos
+et après la sortie du hero. Le fond reste statique sur petit écran, sur écran tactile,
+avec `prefers-reduced-motion: reduce` et sur les navigateurs ne prenant pas en charge
+les animations liées au scroll. Les hauteurs réelles des sections sont conservées
+pour éviter les sauts d’ancre liés aux hauteurs estimées.
+
+Approche documentée par [Chrome for Developers](https://developer.chrome.com/blog/scroll-animation-performance-case-study/).
 
 ## Vérification
 
@@ -50,3 +61,11 @@ et paysage, ainsi qu’avec le texte agrandi à 200 %.
 Le site reste statique : aucune installation ou compilation supplémentaire.
 Sur le serveur existant, `git pull` puis un rechargement forcé du navigateur appliquent
 la mise à jour.
+
+Après correction des ralentissements du hero : sur un parcours identique de 40 positions
+de défilement à 1920 × 1080 et densité 2, les appels applicatifs à `requestAnimationFrame`
+passent de 40 à 0, les inscriptions à l’événement `scroll` de 1 à 0, et le filtre calculé
+du fond devient `none`. Aucun calcul de disposition n’est déclenché pendant ce parcours.
+Ces mesures locales ne constituent pas une mesure des FPS sur la machine du joueur.
+Les cas mouvement réduit, tablette tactile et absence de prise en charge de la timeline
+ont également été vérifiés.

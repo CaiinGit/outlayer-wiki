@@ -281,75 +281,6 @@ document.getElementById("year").textContent = new Date().getFullYear();
 buildCategoryFilters();
 buildProgress();
 render();
-function setupHeroParallax() {
-  const hero = document.querySelector(".parallax-hero");
-  const bg = document.querySelector(".parallax-hero-bg");
-  if (!hero || !bg) return;
-
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const smallScreen = window.matchMedia("(max-width: 720px)");
-  const coarsePointer = window.matchMedia("(pointer: coarse)");
-  let frame = 0;
-  let visible = false;
-  let listening = false;
-  let heroTop = 0;
-  let heroHeight = 0;
-  let previousOffset = -1;
-
-  function measure() {
-    const rect = hero.getBoundingClientRect();
-    heroTop = rect.top + window.scrollY;
-    heroHeight = rect.height;
-    requestUpdate();
-  }
-
-  function update() {
-    frame = 0;
-    if (!listening) return;
-    const travelled = Math.max(0, Math.min(heroHeight, window.scrollY - heroTop));
-    const offset = Math.round(Math.min(58, travelled * 0.12) * 100) / 100;
-    if (offset === previousOffset) return;
-    // Only the composited background moves. No layout reads or inherited CSS writes per frame.
-    bg.style.transform = `translate3d(0, ${offset}px, 0)`;
-    previousOffset = offset;
-  }
-
-  function requestUpdate() {
-    if (listening && !frame) frame = window.requestAnimationFrame(update);
-  }
-
-  function syncMotion() {
-    const allowed = !reduceMotion.matches && !smallScreen.matches && !coarsePointer.matches;
-    const enabled = allowed && visible && !document.hidden;
-    if (enabled !== listening) {
-      listening = enabled;
-      if (enabled) window.addEventListener("scroll", requestUpdate, { passive: true });
-      else window.removeEventListener("scroll", requestUpdate);
-    }
-    if (!enabled && frame) {
-      window.cancelAnimationFrame(frame);
-      frame = 0;
-    }
-    bg.style.willChange = enabled ? "transform" : "auto";
-    if (!allowed) {
-      bg.style.removeProperty("transform");
-      previousOffset = -1;
-    }
-    if (enabled) measure();
-  }
-
-  const observer = new IntersectionObserver(([record]) => {
-    visible = record.isIntersecting;
-    syncMotion();
-  });
-  observer.observe(hero);
-  new ResizeObserver(measure).observe(hero);
-  window.addEventListener("resize", measure, { passive: true });
-  window.addEventListener("pageshow", syncMotion);
-  document.addEventListener("visibilitychange", syncMotion);
-  [reduceMotion, smallScreen, coarsePointer].forEach((query) => query.addEventListener("change", syncMotion));
-}
-
 function setupNavigationTracking() {
   const observer = new IntersectionObserver((records) => {
     records.forEach((record) => {
@@ -359,5 +290,4 @@ function setupNavigationTracking() {
   document.querySelectorAll("main > section[id]").forEach((section) => observer.observe(section));
 }
 
-setupHeroParallax();
 setupNavigationTracking();
