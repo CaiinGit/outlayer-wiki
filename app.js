@@ -242,3 +242,55 @@ buildCategoryFilters();
 buildProgress();
 render();
 setupReveal();
+
+
+function setupHeroParallax() {
+  const hero = document.querySelector(".parallax-hero");
+  const bg = document.querySelector(".parallax-hero-bg");
+  const content = document.querySelector(".parallax-hero-content");
+
+  if (!hero || !bg || !content) return;
+
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const smallScreen = window.matchMedia("(max-width: 720px)");
+
+  let ticking = false;
+
+  function update() {
+    ticking = false;
+
+    if (reduceMotion.matches || smallScreen.matches) {
+      hero.style.setProperty("--parallax-y", "0px");
+      hero.style.setProperty("--content-parallax-y", "0px");
+      return;
+    }
+
+    const rect = hero.getBoundingClientRect();
+    const viewport = window.innerHeight;
+
+    if (rect.bottom < 0 || rect.top > viewport) return;
+
+    const travelled = Math.max(0, -rect.top);
+    const bgOffset = Math.min(58, travelled * 0.16);
+    const contentOffset = Math.min(24, travelled * 0.055);
+
+    hero.style.setProperty("--parallax-y", bgOffset + "px");
+    hero.style.setProperty("--content-parallax-y", contentOffset + "px");
+  }
+
+  function requestUpdate() {
+    if (!ticking) {
+      window.requestAnimationFrame(update);
+      ticking = true;
+    }
+  }
+
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+  reduceMotion.addEventListener?.("change", requestUpdate);
+  smallScreen.addEventListener?.("change", requestUpdate);
+
+  update();
+}
+
+setupHeroParallax();
