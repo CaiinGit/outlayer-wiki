@@ -1,81 +1,38 @@
-# Gérer les archives d’Outlayer
+# Guide de contenu — Outlayer
 
-Le contenu se modifie dans `data/codex.json`. Seul **Le Noyau** est actuellement connu.
-Le fichier contient `version: 1` et la liste `entries`. Les champs sont obligatoires ;
-les listes peuvent être vides et l’image peut valoir `null`.
+Le contenu de campagne se gère désormais dans **l’espace MJ**, accessible à `/admin/`.
+Voir le [guide complet](ADMIN.md) pour l’installation et la publication.
 
-| Champ | Usage |
-| --- | --- |
-| `id` | Identifiant unique stable : minuscules, chiffres et tirets |
-| `type` | Lieux, Personnages, Factions, Bestiaire, Artefacts, Utilitaires ou Divinités |
-| `name` | Nom ; `???` si inconnue |
-| `description` | Description publique de la fiche |
-| `known` | `true` ouvre la fiche ; `false` affiche une archive scellée |
-| `visible` | `false` retire la fiche de la grille, de la recherche et de la progression |
-| `image` | Chemin local sous `assets/` ou `null` |
-| `subtitle` | Précision sous le nom |
-| `teaser` | Texte public affiché sur la carte |
-| `symbol` | Symbole utilisé sans image |
-| `details` | Liste de paragraphes complémentaires |
-| `tags` | Mots-clés utilisés par la recherche |
+## Champs d’une fiche
 
-Les monstres et autres créatures vont dans **Bestiaire**. Les règles et aides de jeu
-vont dans **Utilitaires**. Les catégories vides restent disponibles comme filtres.
+- **Type** : Lieux, Personnages, Factions, Bestiaire, Artefacts, Utilitaires ou Divinités.
+- **Nom**, **sous-titre**, **texte de carte**, **description**, détails et mots-clés.
+- **Illustration** et symbole de remplacement.
+- **Archives liées** : liens vers d’autres fiches du codex.
+- **Notes privées du MJ** : jamais publiées.
 
-## Exemple d’archive inconnue
+Les monstres et créatures vont dans Bestiaire ; les règles et aides de jeu dans Utilitaires.
+L’illustration du Noyau est un emblème décoratif, pas une carte géographique canonique.
 
-```json
-{
-  "id": "unknown-person-02",
-  "type": "Personnages",
-  "name": "???",
-  "description": "",
-  "known": false,
-  "visible": true,
-  "image": "assets/codex/sealed.svg",
-  "subtitle": "Identité inconnue",
-  "teaser": "Une rencontre attend encore d’être consignée.",
-  "symbol": "?",
-  "details": [],
-  "tags": ["inconnu"]
-}
-```
+## Brouillon et publication
 
-Pour révéler cette fiche, conserver son identifiant, passer `known` à `true`, puis
-remplir son nom, sa description et les seules informations apprises pendant la campagne.
-Une image connue s’affiche nette. Une archive inconnue utilise toujours le sceau générique
-assombri, sans calcul de flou dans le navigateur. Le visuel du Noyau est un emblème
-abstrait décoratif, pas une représentation géographique canonique.
+Enregistrer le brouillon conserve votre travail sans modifier la fiche des joueurs.
+Prévisualiser affiche les champs destinés aux joueurs ; révéler en publie une copie.
+Sceller affiche uniquement la catégorie, un nom `???` et une image générique assombrie.
+Retirer masque totalement l’archive côté joueur. Le brouillon reste disponible dans les deux cas.
 
-Pour ajouter une image, déposer le fichier dans `assets/codex/`, puis renseigner son chemin.
-Préférer un WebP de 800 × 400 pixels sous 150 Ko ; les autres proportions sont recadrées
-au centre. Les images ne sont pas automatiquement compressées à l’ajout.
-Les SVG doivent être des fichiers de confiance. N’utiliser que des visuels publics.
+Les descriptions publiques doivent contenir uniquement ce que les personnages ont appris.
+Les notes privées peuvent contenir les secrets de campagne. Elles restent dans SQLite,
+hors du dépôt et du site public. Le fichier `data/codex.json` sert seulement au premier import :
+ne pas y ajouter de secrets ou essayer de l’utiliser pour modifier une base déjà initialisée.
 
-## Publication et confidentialité
+Une information déjà révélée ne peut pas être effacée de la mémoire ou des copies des joueurs.
+Les images précédemment présentes dans le dossier public `assets/` restent publiques.
+Pour une nouvelle illustration privée, utiliser l’import de l’espace MJ.
 
-Le dépôt et son catalogue sont publics. `known` et `visible` contrôlent la présentation,
-pas l’accès au fichier source. Aucun secret MJ, nom réel inconnu, image secrète ou brouillon
-confidentiel ne doit y être ajouté, même avec `visible: false`. Les sous-titres et teasers
-doivent eux aussi rester anonymes. Une entrée invalide provoque un message d’erreur
-au lieu d’un affichage partiel du catalogue.
+## Source narrative
 
-Les notes privées restent dans une source privée distincte. L’histoire annexe de **Serge**
-n’est pas une source du wiki joueur. Cette règle vaut aussi pour les chroniques du site.
-
-Vérification avec Node.js (aucune dépendance) :
-
-```bash
-node --test tests/catalog.test.cjs
-```
-
-Le test de progression décrit le début de campagne : mettre à jour son nombre et sa liste
-de découvertes lors d’une révélation intentionnelle. Puis publier sur GitHub.
-Sur le serveur :
-
-```bash
-cd /srv/docker/outlayer-wiki
-git pull
-```
-
-Recharger avec Ctrl + F5. Aucun redémarrage de Nginx ni changement Docker n’est nécessaire.
+Seul Le Noyau est découvert au démarrage. L’histoire annexe centrée sur **Serge** n’est pas
+une source automatique pour le codex joueur. Ajouter uniquement le lore principal validé
+ou les informations découvertes pendant la campagne principale. Cette règle vaut aussi
+pour les chroniques et tous les autres textes publics du site.

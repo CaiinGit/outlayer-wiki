@@ -4,3 +4,8 @@ Thumbs.db
 .idea/
 *.log
 .env
+*.sqlite
+*.sqlite-*
+*.restore
+__pycache__/
+.venv/

@@ -1,53 +1,57 @@
 # Outlayer Wiki
 
-Codex joueur du JDR **Outlayer**, créé par Valentin Brizard.
-Seul **Le Noyau** est actuellement connu ; six archives restent scellées.
+Codex joueur et atelier privé du MJ pour **Outlayer**, l’univers de Valentin Brizard.
+Le catalogue initial contient sept archives, dont seul **Le Noyau** est découvert.
 
-## Architecture
+## Installer cette version
 
-Le site reste statique, servi par Nginx. `data/codex.json` contient le catalogue public,
-séparé du code d’affichage. `catalog.js` valide et prépare les données ; `app.js` gère
-la recherche, les catégories, les fiches et la progression. Aucun paquet n’est nécessaire
-pour servir le site.
-
-Le contenu est publié par Git et tous les joueurs consultent les mêmes archives :
-ajouter une base et un serveur applicatif ne répondrait pas à un besoin actuel.
-Une interface privée d’édition, des comptes ou des révélations par groupe justifieraient
-une API et une base SQLite côté serveur. Cette évolution devra garder les données privées
-hors de la racine publique de Nginx et ajouter authentification et sauvegardes.
-
-## Codex
-
-- Types : Lieux, Personnages, Factions, Bestiaire, Artefacts, Utilitaires, Divinités.
-- État connu/inconnu et option de visibilité indépendants.
-- Image nette pour les découvertes ; sceau générique assombri pour les archives inconnues.
-- Recherche sans accents, index préparé une seule fois au chargement.
-- Affichage limité à 24 cartes initiales, puis bouton pour afficher les suivantes.
-- Images chargées à l’approche de l’écran, dimensions réservées et décodage asynchrone.
-- Erreur de chargement explicite et bouton pour réessayer.
-
-Le catalogue est revalidé auprès du serveur à chaque visite (`cache: no-cache`). Le hero
-conserve son fond déjà flouté et son parallaxe CSS ; aucune boucle JavaScript de scroll
-n’est ajoutée. Voir `docs/HERO.md`.
-
-## Modifier les fiches
-
-Voir **[le guide de contenu](docs/CONTENT-GUIDE.md)** pour les champs et un exemple.
-Le dépôt est public : aucun secret MJ ne doit y être enregistré, même dans une fiche masquée.
-L’ancien `data.js` n’est plus chargé ; toute modification du contenu se fait dans le JSON.
-
-Vérification locale (Node.js, aucune dépendance) :
-
-```bash
-node --test tests/catalog.test.cjs
-```
-
-## Serveur existant
+Dans la connexion SSH au serveur :
 
 ```bash
 cd /srv/docker/outlayer-wiki
 git pull
+docker compose up -d --build
+docker compose exec api python -m server.manage set-password
 ```
 
-Puis Ctrl + F5. L’installation initiale utilise `docker compose up -d`.
-Adresse locale : `http://192.168.1.197:8081`. Le port 8080 reste celui du portfolio.
+Choisir un mot de passe MJ d’au moins 12 caractères. Ouvrir ensuite
+`http://192.168.1.197:8081/admin/`. Aucun mot de passe n’est fourni par défaut.
+Le codex joueur garde son adresse habituelle.
+
+**[Installation, utilisation et sauvegardes](docs/ADMIN.md)**
+
+## Fonctions
+
+- Brouillons privés et notes MJ séparés des versions publiées.
+- Import d’images, conversion WebP et contrôle de leur accès.
+- Prévisualisation avec le même rendu que le site joueur.
+- Révéler, mettre à jour, sceller ou retirer une fiche.
+- Liens entre archives connues et cinq dernières découvertes.
+- Recherche sans accents, cartes par lots et chargement progressif des images.
+- Sauvegarde SQLite quotidienne, 14 copies conservées, restauration en ligne de commande.
+
+## Architecture
+
+Nginx sert uniquement les fichiers publics et transmet les appels API au serveur Flask/Waitress.
+SQLite contient les brouillons, publications, images et sessions dans un volume Docker privé.
+Un second service sauvegarde la base dans un volume distinct. Le code source reste public ;
+aucune donnée privée ne doit être ajoutée au dépôt.
+
+`data/codex.json` initialise uniquement une nouvelle base. Le contenu se gère ensuite dans
+l’espace MJ ; les mises à jour Git n’écrasent pas les archives. Les tests de campagne portent
+sur le catalogue initial. Voir aussi le [guide de contenu](docs/CONTENT-GUIDE.md).
+
+Le hero conserve le logo approuvé et les optimisations de parallaxe documentées dans
+[HERO.md](docs/HERO.md).
+
+## Vérifications
+
+```bash
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -p 'test_*.py' -v
+node --test tests/catalog.test.cjs
+```
+
+Les parcours navigateur ont également été vérifiés sur ordinateur et mobile.
+La construction Docker reste à exécuter sur le serveur : Docker n’est pas installé sur
+le poste de développement utilisé pour cette modification.

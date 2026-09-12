@@ -8,7 +8,7 @@
   <title>Outlayer — Codex des joueurs</title>
   <link rel="preload" as="image" href="assets/outlayer-landscape-soft.webp" media="(min-width: 721px)">
   <link rel="preload" as="image" href="assets/outlayer-landscape-mobile-soft.webp" media="(max-width: 720px)">
-  <link rel="stylesheet" href="styles.css?v=codex-4">
+  <link rel="stylesheet" href="styles.css?v=mj-1">
 </head>
 <body>
   <a class="skip-link" href="#codex">Aller au codex</a>
@@ -76,6 +76,11 @@
         <p>Retrouvez vos découvertes. Les archives encore scellées se dévoileront au fil de votre aventure.</p>
       </div>
 
+      <section class="discoveries" aria-labelledby="discoveriesTitle">
+        <h3 id="discoveriesTitle">Dernières découvertes</h3>
+        <p id="noDiscoveries">Les prochaines révélations de votre aventure apparaîtront ici.</p>
+        <div id="recentDiscoveries"></div>
+      </section>
       <div class="codex-toolbar reveal">
         <label class="search-box">
           <span aria-hidden="true">⌕</span>
@@ -188,7 +193,7 @@
 
   <footer class="footer">
     <span>OUTLAYER — Codex des joueurs</span>
-    <nav class="footer-nav" aria-label="Informations du codex"><a href="#progression">Progression</a><a href="#apropos">À propos</a></nav>
+    <nav class="footer-nav" aria-label="Informations du codex"><a href="#progression">Progression</a><a href="#apropos">À propos</a><a href="/admin/">Espace MJ</a></nav>
     <span>Univers de Valentin Brizard · <span id="year"></span></span>
   </footer>
 
@@ -197,7 +202,8 @@
     <div id="dialogContent"></div>
   </dialog>
 
-  <script src="catalog.js?v=codex-4" defer></script>
-  <script src="app.js?v=codex-4" defer></script>
+  <script src="catalog.js?v=mj-1" defer></script>
+  <script src="entry-view.js?v=mj-1" defer></script>
+  <script src="app.js?v=mj-1" defer></script>
 </body>
 </html>

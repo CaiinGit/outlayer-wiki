@@ -63,9 +63,9 @@ ancres sous la navigation, arrêt du parallaxe hors écran, mouvement réduit et
 du seul fond mobile. Affichages vérifiés entre 320 et 1983 pixels de large, en portrait
 et paysage, ainsi qu’avec le texte agrandi à 200 %.
 
-Le site reste statique : aucune installation ou compilation supplémentaire.
-Sur le serveur existant, `git pull` puis un rechargement forcé du navigateur appliquent
-la mise à jour.
+Le hero reste servi comme des fichiers statiques. Le codex utilise désormais l’API
+et la base SQLite de l’espace MJ : suivre [le guide d’installation](ADMIN.md) pour
+reconstruire les services Docker et configurer le compte privé.
 
 Après correction des ralentissements du hero : sur un parcours identique de 40 positions
 de défilement à 1920 × 1080 et densité 2, les appels applicatifs à `requestAnimationFrame`

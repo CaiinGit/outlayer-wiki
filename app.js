@@ -164,13 +164,17 @@ async function loadCatalog() {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   try {
-    const response = await fetch("data/codex.json", { cache: "no-cache", signal: controller.signal });
+    const previewId = new URLSearchParams(location.search).get("preview");
+    const endpoint = previewId ? "/api/admin/preview/" + encodeURIComponent(previewId) : "/api/catalog";
+    const response = await fetch(endpoint, { cache: "no-store", signal: controller.signal });
     if (!response.ok) throw Error("Catalogue indisponible");
     entries = readCatalog(await response.json());
     entriesById = new Map(entries.map(entry => [entry.id, entry]));
     catalogReady = true;
     buildProgress();
+    buildDiscoveries();
     render();
+    if (previewId) openEntry(previewId);
   } catch {
     document.getElementById("catalogError").hidden = false;
     resultCount.textContent = "Archives indisponibles";
@@ -183,38 +187,31 @@ async function loadCatalog() {
 document.getElementById("retryCatalog").addEventListener("click", loadCatalog);
 
 function openEntry(id) {
-  const source = entriesById.get(id);
-  const entry = source && { ...source, ...Object.fromEntries(["title", "category", "symbol", "subtitle", "summary", "teaser"].map(key => [key, escape(source[key])])) };
-  if (!entry || entry.status === "locked") return;
-
-  const meta = statusMeta[entry.status];
-  const details = (entry.details || [])
-    .map((detail) => `<li>${escape(detail)}</li>`)
-    .join("");
-
-  const tags = (entry.tags || [])
-    .map((tag) => `<span>${escape(tag)}</span>`)
-    .join("");
-
-  dialogContent.innerHTML = `
-    <div class="dialog-hero status-${entry.status}">
-      <span class="dialog-symbol" aria-hidden="true">${entry.symbol || "?"}</span>
-      <p class="dialog-category">${entry.category} · ${meta.label}</p>
-      <h2 id="entryTitle">${entry.title}</h2>
-      <p class="dialog-subtitle">${entry.subtitle}</p>
-    </div>
-    <div class="dialog-body">
-      ${entry.image ? `<img class="dialog-image" src="${escape(entry.image)}" alt="Illustration de ${entry.title}" width="800" height="400" decoding="async">` : ""}
-      <p class="dialog-summary">${entry.summary || entry.teaser}</p>
-      ${details ? `<ul class="dialog-details">${details}</ul>` : ""}
-      ${tags ? `<div class="dialog-tags">${tags}</div>` : ""}
-      <p class="dialog-note">
-        Cette fiche contient uniquement des informations accessibles aux joueurs.
-      </p>
-    </div>
-  `;
-
-  dialog.showModal();
+  const entry = entriesById.get(id);
+  if (!entry || entry.status !== "known") return;
+  dialogContent.innerHTML = window.outlayerEntryView(entry, entriesById);
+  if (!dialog.open) dialog.showModal();
+  dialog.scrollTop = 0;
+}
+dialogContent.addEventListener("click", event => {
+  const link = event.target.closest("[data-related]");
+  if (link) { openEntry(link.dataset.related); dialogClose.focus({preventScroll: true}); }
+});
+function buildDiscoveries() {
+  const recent = entries.filter(e => e.status === "known" && e.revealedAt)
+    .sort((a, b) => Date.parse(b.revealedAt) - Date.parse(a.revealedAt)).slice(0, 5);
+  const list = document.getElementById("recentDiscoveries");
+  list.replaceChildren();
+  document.getElementById("noDiscoveries").hidden = recent.length !== 0;
+  for (const entry of recent) {
+    const button = document.createElement("button");
+    button.type = "button"; button.className = "discovery-link";
+    const title = document.createElement("strong"); title.textContent = entry.title;
+    const date = document.createElement("span");
+    date.textContent = entry.category + " · " + new Date(entry.revealedAt).toLocaleDateString("fr-FR");
+    button.append(title, date); button.addEventListener("click", () => openEntry(entry.id));
+    list.append(button);
+  }
 }
 
 function buildProgress() {

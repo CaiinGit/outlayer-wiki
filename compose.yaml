@@ -5,5 +5,46 @@ services:
     restart: unless-stopped
     ports:
       - "192.168.1.197:8081:80"
+    depends_on:
+      api:
+        condition: service_healthy
     volumes:
-      - ./:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./index.html:/usr/share/nginx/html/index.html:ro
+      - ./styles.css:/usr/share/nginx/html/styles.css:ro
+      - ./app.js:/usr/share/nginx/html/app.js:ro
+      - ./catalog.js:/usr/share/nginx/html/catalog.js:ro
+      - ./entry-view.js:/usr/share/nginx/html/entry-view.js:ro
+      - ./assets:/usr/share/nginx/html/assets:ro
+      - ./admin:/usr/share/nginx/html/admin:ro
+  api:
+    build: .
+    restart: unless-stopped
+    environment:
+      APP_ORIGIN: ${APP_ORIGIN:-http://192.168.1.197:8081}
+      COOKIE_SECURE: ${COOKIE_SECURE:-0}
+    volumes:
+      - codex-data:/data
+      - codex-backups:/backups
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    security_opt:
+      - no-new-privileges:true
+  backup:
+    build: .
+    restart: unless-stopped
+    command: ["python", "-m", "server.manage", "backup-loop"]
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - codex-data:/data
+      - codex-backups:/backups
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  codex-data:
+  codex-backups:

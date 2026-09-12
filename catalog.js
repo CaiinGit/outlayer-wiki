@@ -18,7 +18,7 @@
       for (const key of ["details", "tags"]) {
         if (!Array.isArray(item[key]) || item[key].some(v => typeof v !== "string")) throw Error(`Liste invalide : ${key}`);
       }
-      if (item.image !== null && (typeof item.image !== "string" || !/^assets\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(?:webp|png|jpg|jpeg|avif|svg)$/.test(item.image))) throw Error("Image locale invalide");
+      if (item.image !== null && (typeof item.image !== "string" || !( /^assets\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9_-]+\.(?:webp|png|jpg|jpeg|avif|svg)$/.test(item.image) || /^\/api\/images\/[a-f0-9]{32}$/.test(item.image) ))) throw Error("Image locale invalide");
       // Unknown records must be public placeholders, never unpublished lore.
       if (!item.known && (item.name !== "???" || item.description || item.details.length || item.tags.some(t => t !== "inconnu") || (item.image !== null && item.image !== UNKNOWN_IMAGE))) throw Error("Une archive inconnue doit rester anonyme");
       return {
@@ -26,6 +26,8 @@
         title: item.name, subtitle: item.subtitle, teaser: item.teaser, summary: item.description,
         details: item.details, tags: item.tags, symbol: item.symbol,
         image: item.known ? item.image : UNKNOWN_IMAGE, visible: item.visible,
+        relations: Array.isArray(item.relations) ? item.relations.filter(id => typeof id === "string") : [],
+        revealedAt: typeof item.revealedAt === "string" && Number.isFinite(Date.parse(item.revealedAt)) ? item.revealedAt : null,
         searchText: normalize([item.name, item.type, item.subtitle, item.teaser, item.description, ...item.tags].join(" "))
       };
     }).filter(item => item.visible);
