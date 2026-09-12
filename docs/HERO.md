@@ -15,26 +15,16 @@ restent scellées.
   chargée seule sur les écrans de 720 pixels ou moins.
 - Les versions `outlayer-landscape.webp` et `outlayer-landscape-mobile.webp` sont
   conservées comme sources ; la page charge uniquement les versions `soft`.
-- `assets/outlayer-lifecraft-crest.webp` : emblème transparent du hero, 1600 × 800 pixels.
-- `assets/outlayer-lifecraft-nav.webp` : version du lettrage pour la navigation,
-  520 × 163 pixels, sans rose des vents.
-- `assets/outlayer-lifecraft-wordmark.webp` : lettrage 3D seul, transparent.
-- `assets/outlayer-lifecraft-outline.svg` : tracés exacts des glyphes LifeCraft utilisés.
-- `assets/outlayer-lifecraft-crest.svg` : composition source, avec le lettrage rendu
-  et la rose des vents existante.
+- `assets/outlayer-logo-original.png` : image transparente fournie par l’utilisateur,
+  1024 × 397 pixels, conservée à l’identique et affichée dans la navigation.
+- `assets/outlayer-logo-hero.svg` : composition du hero, avec la rose des vents existante
+  et cette même image intégrée, sans modification des lettres, des couleurs ou du relief.
+- Les anciennes variantes `outlayer-lifecraft-*` restent archivées mais ne sont plus chargées.
 
-Le mot OUTLAYER utilise **LifeCraft_Font.ttf** (famille interne « LifeCraft », nom complet
-« LifeCraftRegular »), par **Eliot Truelove**, téléchargée depuis
-[la page de l’auteur sur DaFont](https://www.dafont.com/lifecraft.font), qui la présente
-comme donationware. Le fichier de police n’est pas chargé par le site.
-
-Les contours de la police ont été convertis en géométrie 3D : faces dorées légèrement
-texturées, biseaux francs, tranche bronze et éclairage de studio. L’espacement a été
-ajusté pour laisser de la place aux biseaux. La rose des vents garde ses tracés et
-sa position d’origine. Le rendu et les ombres sont calculés une fois à l’export.
-Le navigateur affiche uniquement les images WebP : aucun moteur 3D, shader, chargement
-de police ou filtre de relief n’est ajouté à la page. Les optimisations du scroll
-restent inchangées.
+Le logo affiché est exactement le visuel approuvé par l’utilisateur. Son relief doré
+est déjà présent dans l’image : aucun filtre, moteur 3D ou chargement de police
+n’est nécessaire. Le SVG conserve les proportions du PNG et ne contient aucun filtre.
+Les optimisations du défilement restent inchangées.
 
 Le paysage a été reconstitué avec l’outil intégré de génération d’images à partir de
 la maquette de l’utilisateur. Instruction de production : retirer la navigation,
