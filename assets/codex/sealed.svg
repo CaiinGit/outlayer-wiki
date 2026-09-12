@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400">
+  <defs><radialGradient id="mist"><stop stop-color="#554a36"/><stop offset="1" stop-color="#121413"/></radialGradient></defs>
+  <path fill="url(#mist)" d="M0 0h800v400H0z"/>
+  <g fill="none" stroke="#b19866" opacity=".3">
+    <circle cx="400" cy="200" r="130"/><circle cx="400" cy="200" r="116"/>
+    <path d="m400 35 165 165-165 165-165-165Z M0 200h800M400 0v400"/>
+  </g>
+  <path fill="#070909" opacity=".5" d="M0 0h800v400H0z"/>
+</svg>

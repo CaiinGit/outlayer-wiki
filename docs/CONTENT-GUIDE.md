@@ -1,80 +1,81 @@
-# Guide de contenu — Outlayer Wiki
+# Gérer les archives d’Outlayer
 
-Ce dépôt est public et destiné aux joueurs.
+Le contenu se modifie dans `data/codex.json`. Seul **Le Noyau** est actuellement connu.
+Le fichier contient `version: 1` et la liste `entries`. Les champs sont obligatoires ;
+les listes peuvent être vides et l’image peut valoir `null`.
 
-État actuel : seul **Le Noyau** est connu. Cette restriction s’applique à `data.js`
-et à tous les textes du site, notamment les chroniques, citations et attributions
-dans `index.html`. Une archive verrouillée ne doit pas être révélée indirectement
-par une autre section de la page.
+| Champ | Usage |
+| --- | --- |
+| `id` | Identifiant unique stable : minuscules, chiffres et tirets |
+| `type` | Lieux, Personnages, Factions, Bestiaire, Artefacts, Utilitaires ou Divinités |
+| `name` | Nom ; `???` si inconnue |
+| `description` | Description publique de la fiche |
+| `known` | `true` ouvre la fiche ; `false` affiche une archive scellée |
+| `visible` | `false` retire la fiche de la grille, de la recherche et de la progression |
+| `image` | Chemin local sous `assets/` ou `null` |
+| `subtitle` | Précision sous le nom |
+| `teaser` | Texte public affiché sur la carte |
+| `symbol` | Symbole utilisé sans image |
+| `details` | Liste de paragraphes complémentaires |
+| `tags` | Mots-clés utilisés par la recherche |
 
-## Règle absolue
+Les monstres et autres créatures vont dans **Bestiaire**. Les règles et aides de jeu
+vont dans **Utilitaires**. Les catégories vides restent disponibles comme filtres.
 
-Un secret MJ ne doit jamais être ajouté au dépôt public puis masqué avec du CSS, du JavaScript, un flou, une classe `hidden` ou un mot de passe côté navigateur.
+## Exemple d’archive inconnue
 
-Si l'information existe dans le dépôt, un joueur peut potentiellement la lire.
-
-## États des fiches
-
-Chaque entrée de `data.js` possède un champ `status`.
-
-### `locked`
-
-Le joueur sait uniquement qu'une entrée existe.
-
-Exemple :
-
-```js
+```json
 {
-  id: "unknown-person-02",
-  category: "Personnages",
-  status: "locked",
-  title: "???",
-  subtitle: "Identité inconnue",
-  symbol: "?",
-  teaser: "Une silhouette demeure inconnue.",
-  summary: "",
-  details: [],
-  tags: ["inconnu"],
-  discoveredLabel: "Inconnu"
+  "id": "unknown-person-02",
+  "type": "Personnages",
+  "name": "???",
+  "description": "",
+  "known": false,
+  "visible": true,
+  "image": "assets/codex/sealed.svg",
+  "subtitle": "Identité inconnue",
+  "teaser": "Une rencontre attend encore d’être consignée.",
+  "symbol": "?",
+  "details": [],
+  "tags": ["inconnu"]
 }
 ```
 
-Ne jamais mettre le vrai nom, la vraie image ou la vraie biographie dans cette entrée.
+Pour révéler cette fiche, conserver son identifiant, passer `known` à `true`, puis
+remplir son nom, sa description et les seules informations apprises pendant la campagne.
+Une image connue s’affiche nette. Une archive inconnue utilise toujours le sceau générique
+assombri, sans calcul de flou dans le navigateur. Le visuel du Noyau est un emblème
+abstrait décoratif, pas une représentation géographique canonique.
 
-### `glimpsed`
+Pour ajouter une image, déposer le fichier dans `assets/codex/`, puis renseigner son chemin.
+Préférer un WebP de 800 × 400 pixels sous 150 Ko ; les autres proportions sont recadrées
+au centre. Les images ne sont pas automatiquement compressées à l’ajout.
+Les SVG doivent être des fichiers de confiance. N’utiliser que des visuels publics.
 
-La chose a été entrevue. Quelques indices non sensibles peuvent être affichés.
+## Publication et confidentialité
 
-### `discovered`
+Le dépôt et son catalogue sont publics. `known` et `visible` contrôlent la présentation,
+pas l’accès au fichier source. Aucun secret MJ, nom réel inconnu, image secrète ou brouillon
+confidentiel ne doit y être ajouté, même avec `visible: false`. Les sous-titres et teasers
+doivent eux aussi rester anonymes. Une entrée invalide provoque un message d’erreur
+au lieu d’un affichage partiel du catalogue.
 
-L'identité ou la nature de l'entrée est connue. Une fiche peut être consultée.
+Les notes privées restent dans une source privée distincte. L’histoire annexe de **Serge**
+n’est pas une source du wiki joueur. Cette règle vaut aussi pour les chroniques du site.
 
-### `known`
+Vérification avec Node.js (aucune dépendance) :
 
-La fiche contient une connaissance relativement complète du point de vue des personnages.
+```bash
+node --test tests/catalog.test.cjs
+```
 
-## Débloquer une fiche
+Le test de progression décrit le début de campagne : mettre à jour son nombre et sa liste
+de découvertes lors d’une révélation intentionnelle. Puis publier sur GitHub.
+Sur le serveur :
 
-Lorsqu'une découverte a lieu pendant la campagne :
+```bash
+cd /srv/docker/outlayer-wiki
+git pull
+```
 
-1. Modifier l'entrée concernée dans `data.js`.
-2. Remplacer `???` par le nom révélé.
-3. Passer le statut à `discovered` ou `known`.
-4. Ajouter uniquement les informations effectivement apprises en jeu.
-5. Commit et push.
-6. Sur `serverdecaiin`, exécuter `git pull`.
-
-Le site sera mis à jour sans redémarrer Nginx puisque les fichiers sont montés directement dans le conteneur.
-
-## Contenu MJ
-
-Les notes MJ, vérités du lore, statistiques secrètes, événements futurs et solutions d'énigmes doivent rester dans une source privée distincte.
-
-
-## Sources narratives exclues du wiki
-
-L'histoire annexe centrée sur **Serge** n'est pas une source de contenu pour le wiki joueur.
-
-Elle peut développer ou illustrer le lore, mais ses scènes, dialogues, rencontres, descriptions narratives et informations propres à cette histoire ne doivent pas être transférés automatiquement dans le codex.
-
-Pour ajouter une information au wiki, elle doit appartenir au lore principal validé ou avoir été découverte pendant la campagne principale.
+Recharger avec Ctrl + F5. Aucun redémarrage de Nginx ni changement Docker n’est nécessaire.

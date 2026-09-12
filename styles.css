@@ -943,3 +943,15 @@ h1 span {
 @media (prefers-reduced-motion: reduce) {
   .parallax-hero-bg { transform: none !important; will-change: auto !important; }
 }
+
+/* Codex images occupy a fixed box; unknown artwork is already darkened. */
+.card-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.card-image[hidden], .dialog-image[hidden] { display: none; }
+.card-visual:has(.card-image:not([hidden]))::before,
+.card-visual:has(.card-image:not([hidden]))::after { display: none; }
+.dialog-image { display: block; width: 100%; height: auto; aspect-ratio: 2; object-fit: cover; border: 1px solid var(--line-soft); border-radius: 8px; margin-bottom: 28px; }
+.catalog-more { text-align: center; margin-top: 24px; }
+.catalog-message { padding: 28px; border: 1px solid var(--line-soft); text-align: center; }
+.catalog-message p { margin-bottom: 16px; }
+.codex-card { animation: none; }
+.card-content h3, .dialog-hero h2, .dialog-body { overflow-wrap: anywhere; }

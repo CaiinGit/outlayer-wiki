@@ -1,5 +1,11 @@
-const entries = window.OUTLAYER_ENTRIES ?? [];
-const categories = window.OUTLAYER_CATEGORIES ?? ["Tous"];
+const { readCatalog, escapeHTML: escape, normalize } = window.OutlayerCatalog;
+let entries = [];
+let entriesById = new Map();
+const categories = ["Tous", ...window.OutlayerCatalog.TYPES];
+const PAGE_SIZE = 24;
+let shownCount = PAGE_SIZE;
+let catalogReady = false;
+let catalogLoading = false;
 
 const grid = document.getElementById("codexGrid");
 const searchInput = document.getElementById("searchInput");
@@ -18,17 +24,9 @@ let activeCategory = "Tous";
 
 const statusMeta = {
   known: { label: "Connu", icon: "◆" },
-  discovered: { label: "Découvert", icon: "✦" },
-  glimpsed: { label: "Entrevue", icon: "◐" },
   locked: { label: "Inconnu", icon: "◇" }
 };
 
-function normalize(value = "") {
-  return value
-    .toLocaleLowerCase("fr")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
-}
 
 function buildCategoryFilters() {
   categoryFilters.innerHTML = "";
@@ -79,34 +77,26 @@ function filteredEntries() {
     const categoryMatch = activeCategory === "Tous" || entry.category === activeCategory;
     const statusMatch = status === "all" || entry.status === status;
 
-    const haystack = normalize([
-      entry.title,
-      entry.subtitle,
-      entry.teaser,
-      entry.summary,
-      ...(entry.tags || [])
-    ].join(" "));
-
-    const searchMatch = !query || haystack.includes(query);
+    const searchMatch = !query || entry.searchText.includes(query);
     return categoryMatch && statusMatch && searchMatch;
   });
 }
 
-function cardTemplate(entry, index) {
+function cardTemplate(entry) {
+  entry = { ...entry, ...Object.fromEntries(["id", "title", "subtitle", "teaser", "category", "symbol"].map(key => [key, escape(entry[key])])) };
   const meta = statusMeta[entry.status] ?? statusMeta.locked;
   const locked = entry.status === "locked";
-  const glimpsed = entry.status === "glimpsed";
   const canOpen = !locked;
 
   return `
     <article
       class="codex-card status-${entry.status} reveal visible"
       data-entry-id="${entry.id}"
-      style="--delay: ${Math.min(index * 35, 280)}ms"
     >
-      <div class="card-visual ${locked ? "is-obscured" : ""} ${glimpsed ? "is-glimpsed" : ""}">
+      <div class="card-visual ${locked ? "is-obscured" : ""}">
+        ${entry.image ? `<img class="card-image" src="${escape(entry.image)}" alt="" width="800" height="400" loading="lazy" decoding="async">` : ""}
         <div class="visual-runes" aria-hidden="true">✦ · ◇ · ✧</div>
-        <div class="entry-symbol" aria-hidden="true">${entry.symbol || "?"}</div>
+        ${locked || !entry.image ? `<div class="entry-symbol" aria-hidden="true">${entry.symbol || "?"}</div>` : ""}
         <span class="status-badge">${meta.icon} ${meta.label}</span>
       </div>
 
@@ -133,35 +123,77 @@ function cardTemplate(entry, index) {
   `;
 }
 
-function render() {
-  const visibleEntries = filteredEntries();
-  grid.innerHTML = visibleEntries.map(cardTemplate).join("");
-  emptyState.hidden = visibleEntries.length !== 0;
-  resultCount.textContent = `${visibleEntries.length} ${visibleEntries.length > 1 ? "entrées" : "entrée"}`;
-
-  grid.querySelectorAll(".entry-open:not([disabled])").forEach((button) => {
-    button.addEventListener("click", (event) => {
-      const card = event.currentTarget.closest("[data-entry-id]");
-      openEntry(card.dataset.entryId);
-    });
-  });
-
-  grid.querySelectorAll(".codex-card:not(.status-locked)").forEach((card) => {
-    card.addEventListener("dblclick", () => openEntry(card.dataset.entryId));
-  });
+function render(reset = true) {
+  if (!catalogReady) return;
+  if (reset) shownCount = PAGE_SIZE;
+  const matches = filteredEntries();
+  if (reset) grid.innerHTML = matches.slice(0, shownCount).map(cardTemplate).join("");
+  else grid.insertAdjacentHTML("beforeend", matches.slice(grid.children.length, shownCount).map(cardTemplate).join(""));
+  emptyState.hidden = matches.length !== 0;
+  const count = Math.min(shownCount, matches.length);
+  resultCount.textContent = count < matches.length ? count + " sur " + matches.length + " entrées" : matches.length + " " + (matches.length > 1 ? "entrées" : "entrée");
+  document.getElementById("loadMore").hidden = count >= matches.length;
 }
 
+grid.addEventListener("click", event => {
+  const button = event.target.closest(".entry-open:not([disabled])");
+  if (button) openEntry(button.closest("[data-entry-id]").dataset.entryId);
+});
+grid.addEventListener("dblclick", event => {
+  const card = event.target.closest(".codex-card:not(.status-locked)");
+  if (card) openEntry(card.dataset.entryId);
+});
+document.getElementById("loadMore").addEventListener("click", () => {
+  const previous = Math.min(shownCount, filteredEntries().length);
+  shownCount += PAGE_SIZE;
+  render(false);
+  const next = grid.children[previous];
+  if (next) { next.tabIndex = -1; next.focus({ preventScroll: true }); }
+});
+// Failed images leave the decorative background in place.
+document.addEventListener("error", event => {
+  if (event.target.matches?.(".card-image, .dialog-image")) event.target.hidden = true;
+}, true);
+
+async function loadCatalog() {
+  if (catalogLoading) return;
+  catalogLoading = true;
+  document.getElementById("catalogError").hidden = true;
+  grid.setAttribute("aria-busy", "true");
+  resultCount.textContent = "Chargement des archives…";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch("data/codex.json", { cache: "no-cache", signal: controller.signal });
+    if (!response.ok) throw Error("Catalogue indisponible");
+    entries = readCatalog(await response.json());
+    entriesById = new Map(entries.map(entry => [entry.id, entry]));
+    catalogReady = true;
+    buildProgress();
+    render();
+  } catch {
+    document.getElementById("catalogError").hidden = false;
+    resultCount.textContent = "Archives indisponibles";
+  } finally {
+    clearTimeout(timeout);
+    catalogLoading = false;
+    grid.setAttribute("aria-busy", "false");
+  }
+}
+document.getElementById("retryCatalog").addEventListener("click", loadCatalog);
+
 function openEntry(id) {
-  const entry = entries.find((item) => item.id === id);
+  const source = entriesById.get(id);
+  const entry = source && { ...source, ...Object.fromEntries(["title", "category", "symbol", "subtitle", "summary", "teaser"].map(key => [key, escape(source[key])])) };
   if (!entry || entry.status === "locked") return;
 
   const meta = statusMeta[entry.status];
   const details = (entry.details || [])
-    .map((detail) => `<li>${detail}</li>`)
+    .map((detail) => `<li>${escape(detail)}</li>`)
     .join("");
 
   const tags = (entry.tags || [])
-    .map((tag) => `<span>${tag}</span>`)
+    .map((tag) => `<span>${escape(tag)}</span>`)
     .join("");
 
   dialogContent.innerHTML = `
@@ -172,6 +204,7 @@ function openEntry(id) {
       <p class="dialog-subtitle">${entry.subtitle}</p>
     </div>
     <div class="dialog-body">
+      ${entry.image ? `<img class="dialog-image" src="${escape(entry.image)}" alt="Illustration de ${entry.title}" width="800" height="400" decoding="async">` : ""}
       <p class="dialog-summary">${entry.summary || entry.teaser}</p>
       ${details ? `<ul class="dialog-details">${details}</ul>` : ""}
       ${tags ? `<div class="dialog-tags">${tags}</div>` : ""}
@@ -279,8 +312,7 @@ new ResizeObserver(([record]) => {
 document.getElementById("year").textContent = new Date().getFullYear();
 
 buildCategoryFilters();
-buildProgress();
-render();
+loadCatalog();
 function setupNavigationTracking() {
   const observer = new IntersectionObserver((records) => {
     records.forEach((record) => {

@@ -8,7 +8,7 @@
   <title>Outlayer — Codex des joueurs</title>
   <link rel="preload" as="image" href="assets/outlayer-landscape-soft.webp" media="(min-width: 721px)">
   <link rel="preload" as="image" href="assets/outlayer-landscape-mobile-soft.webp" media="(max-width: 720px)">
-  <link rel="stylesheet" href="styles.css?v=hero-3">
+  <link rel="stylesheet" href="styles.css?v=codex-4">
 </head>
 <body>
   <a class="skip-link" href="#codex">Aller au codex</a>
@@ -72,7 +72,7 @@
     <section id="codex" class="section codex-section">
       <div class="section-heading reveal">
         <p class="kicker">CODEX</p>
-        <h2>Archives accessibles.</h2>
+        <h2>Les archives d’Outlayer.</h2>
         <p>Retrouvez vos découvertes. Les archives encore scellées se dévoileront au fil de votre aventure.</p>
       </div>
 
@@ -89,24 +89,26 @@
           <select id="statusSelect">
             <option value="all">Tous</option>
             <option value="known">Connu</option>
-            <option value="discovered">Découvert</option>
-            <option value="glimpsed">Entrevue</option>
             <option value="locked">Inconnu</option>
           </select>
         </div>
       </div>
 
       <div class="results-meta reveal">
-        <span id="resultCount">0 entrée</span>
+        <span id="resultCount" role="status">Chargement des archives…</span>
         <span class="legend">
           <i class="legend-dot known"></i> connu
-          <i class="legend-dot discovered"></i> découvert
-          <i class="legend-dot glimpsed"></i> entrevu
           <i class="legend-dot locked"></i> inconnu
         </span>
       </div>
 
-      <div class="codex-grid" id="codexGrid" aria-live="polite"></div>
+      <div id="catalogError" class="catalog-message" hidden>
+        <p>Les archives ne sont pas disponibles pour le moment.</p>
+        <button id="retryCatalog" class="filter-button" type="button">Réessayer</button>
+      </div>
+      <div class="codex-grid" id="codexGrid" aria-busy="true"></div>
+      <div class="catalog-more"><button id="loadMore" class="filter-button" type="button" hidden>Afficher plus d’archives</button></div>
+      <noscript><p>Activez JavaScript pour consulter et rechercher les archives.</p></noscript>
 
       <div class="empty-state" id="emptyState" hidden>
         <span>∅</span>
@@ -195,7 +197,7 @@
     <div id="dialogContent"></div>
   </dialog>
 
-  <script src="data.js"></script>
-  <script src="app.js?v=hero-3"></script>
+  <script src="catalog.js?v=codex-4" defer></script>
+  <script src="app.js?v=codex-4" defer></script>
 </body>
 </html>
