@@ -4,8 +4,8 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Atelier du MJ — Outlayer</title>
-  <link rel="stylesheet" href="/admin/admin.css?v=pages-1">
-  <script src="/admin/admin.js?v=pages-1" defer></script>
+  <link rel="stylesheet" href="/admin/admin.css?v=teasers-1">
+  <script src="/admin/admin.js?v=teasers-1" defer></script>
 </head>
 <body>
   <header><a class="brand" href="/"><img src="/assets/outlayer-logo-original.png" width="1024" height="397" alt="Outlayer"></a><span>ATELIER DU MJ</span><a href="/" target="_blank" rel="noopener">Voir le codex ↗</a><button id="logout" hidden>Se déconnecter</button></header>
@@ -35,7 +35,7 @@
             <fieldset><legend>Archives liées</legend><p>Les joueurs verront uniquement les liens vers d’autres fiches révélées.</p><p id="selectedCount"></p><div id="selectedRelations"></div><label>Rechercher une archive à relier<input id="relationSearch" type="search" maxlength="200" placeholder="Nom, type, mot-clé…"></label><p id="relationStatus" role="status"></p><button id="relationRetry" type="button" hidden>Réessayer la recherche</button><div id="relations" class="relations"></div><nav class="list-pagination" aria-label="Pages des archives à relier"><button type="button" id="relationPrev">← Précédente</button><button type="button" id="relationNext">Suivante →</button></nav></fieldset>
             <label class="private-note">Notes privées du MJ<textarea name="notes" rows="5" maxlength="30000" placeholder="Secrets, intentions, événements futurs… Ces notes ne sont jamais publiées."></textarea></label>
             <div class="actions"><button type="submit" class="primary" id="save">Enregistrer le brouillon</button><button type="button" id="preview">Prévisualiser côté joueurs</button></div>
-            <section class="publication"><h3>Ce que les joueurs voient</h3><p>Ces actions utilisent le brouillon enregistré. Une archive scellée apparaît sous « ??? », avec un sceau générique.</p><div class="actions"><button type="button" id="publish" class="primary">Révéler aux joueurs</button><button type="button" id="seal">Sceller l’archive</button><button type="button" id="hide">Retirer du codex</button></div><p>Retirer ou sceller conserve votre brouillon. Cela ne peut pas effacer ce qu’un joueur a déjà lu ou enregistré.</p></section>
+            <section class="publication"><h3>Ce que les joueurs voient</h3><p>Ces actions utilisent le brouillon enregistré. Une archive scellée apparaît sous « ??? », avec son illustration très floutée, ou un sceau si aucune image compatible n’est disponible.</p><div class="actions"><button type="button" id="publish" class="primary">Révéler aux joueurs</button><button type="button" id="seal">Sceller l’archive</button><button type="button" id="hide">Retirer du codex</button></div><p>Retirer ou sceller conserve votre brouillon. Cela ne peut pas effacer ce qu’un joueur a déjà lu ou enregistré.</p></section>
           </form>
         </section>
       </div>

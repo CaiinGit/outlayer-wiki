@@ -37,3 +37,9 @@ test('hidden entries leave search and progress; missing images are allowed', () 
 test('escapes HTML delimiters in editable text', () => {
   assert.equal(escapeHTML('<img src="x" onerror=\'x\'>&'), '&lt;img src=&quot;x&quot; onerror=&#39;x&#39;&gt;&amp;');
 });
+test('sealed cards accept only derived teaser URLs, never the private original', () => {
+  const data=clone(); data.entries[1].image='/api/teasers/'+'a'.repeat(32);
+  assert.equal(readCatalog(data)[1].image,data.entries[1].image);
+  data.entries[1].image='/api/images/'+'a'.repeat(32);
+  assert.throws(()=>readCatalog(data), /anonyme/);
+});

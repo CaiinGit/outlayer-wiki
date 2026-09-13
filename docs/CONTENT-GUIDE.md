@@ -18,7 +18,8 @@ L’illustration du Noyau est un emblème décoratif, pas une carte géographiqu
 
 Enregistrer le brouillon conserve votre travail sans modifier la fiche des joueurs.
 Prévisualiser affiche les champs destinés aux joueurs ; révéler en publie une copie.
-Sceller affiche uniquement la catégorie, un nom `???` et une image générique assombrie.
+Sceller affiche uniquement la catégorie, un nom `???` et une copie très floutée de l’image
+importée. Sans image compatible, un sceau générique est affiché. L’original privé reste protégé.
 Retirer masque totalement l’archive côté joueur. Le brouillon reste disponible dans les deux cas.
 
 Les descriptions publiques doivent contenir uniquement ce que les personnages ont appris.

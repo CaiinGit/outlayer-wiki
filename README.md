@@ -24,6 +24,7 @@ Le codex joueur garde son adresse habituelle.
 
 - Brouillons privés et notes MJ séparés des versions publiées.
 - Import d’images, conversion WebP et contrôle de leur accès.
+- Illustrations précalculées très floutées pour les archives scellées, sans transmettre l’original privé.
 - Prévisualisation avec le même rendu que le site joueur.
 - Révéler, mettre à jour, sceller ou retirer une fiche.
 - Liens entre archives connues et cinq dernières découvertes.

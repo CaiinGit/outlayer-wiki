@@ -74,8 +74,8 @@ Pour une fiche déjà révélée, enregistrer un brouillon ne change pas sa vers
 Le bouton devient **Publier la mise à jour**. Les notes MJ ne sont jamais copiées dans
 la publication. Le mot `???` doit être remplacé avant de révéler une archive.
 
-**Sceller l’archive** remplace la fiche publique par un nom `???`, sa catégorie et un
-sceau générique assombri. **Retirer du codex** retire même cette carte. Les deux actions
+**Sceller l’archive** remplace la fiche publique par un nom `???`, sa catégorie et une
+version très floutée et légèrement assombrie de son illustration. **Retirer du codex** retire même cette carte. Les deux actions
 conservent le brouillon et permettent une nouvelle révélation ultérieure. Elles ne peuvent
 pas effacer une information déjà lue, copiée ou téléchargée par un joueur.
 
@@ -83,6 +83,18 @@ Une image importée est privée tant qu’aucune fiche révélée ne l’utilise
 cette autorisation à chaque téléchargement. Les fichiers sont convertis en WebP, redimensionnés
 à 1600 × 1000 pixels maximum, sans métadonnées d’origine. Limites : 10 Mo et 20 millions
 de pixels à l’import. Les anciennes images du dossier public `assets/` restent publiques.
+
+Le teaser est une copie WebP de 800 × 400 pixels : les détails sont réduits puis floutés
+côté serveur, sans filtre recalculé pendant le scroll. Seules les couleurs et grandes
+masses servent d’indices visuels ; un flou ne garantit pas qu’aucun joueur ne devinera le sujet.
+Le navigateur joueur ne reçoit ni l’original privé ni son URL. Sans image raster compatible
+(notamment pour un ancien SVG), le sceau générique est conservé : importer une image depuis
+l’atelier permet d’obtenir le teaser. Les noms, descriptions et notes restent masqués.
+
+À la première mise à jour, les archives déjà scellées ayant une image compatible reçoivent
+automatiquement ce traitement. Ensuite, enregistrer un nouveau brouillon ne change pas
+le teaser : cliquer à nouveau sur **Sceller l’archive** pour le mettre à jour. La même source
+réutilise la même copie floutée, stockée dans SQLite et incluse dans les sauvegardes.
 
 Les liens sont directionnels. Ils apparaissent côté joueur uniquement lorsque les deux
 archives sont révélées. Les cinq dernières révélations apparaissent en tête du codex.

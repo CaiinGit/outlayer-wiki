@@ -83,7 +83,7 @@ function cardTemplate(entry) {
       <div class="card-visual ${locked ? "is-obscured" : ""}">
         ${entry.image ? `<img class="card-image" src="${escape(entry.image)}" alt="" width="800" height="400" loading="lazy" decoding="async">` : ""}
         <div class="visual-runes" aria-hidden="true">✦ · ◇ · ✧</div>
-        ${locked || !entry.image ? `<div class="entry-symbol" aria-hidden="true">${entry.symbol || "?"}</div>` : ""}
+        ${!entry.image || entry.image === window.OutlayerCatalog.UNKNOWN_IMAGE ? `<div class="entry-symbol" aria-hidden="true">${entry.symbol || "?"}</div>` : ""}
         <span class="status-badge">${meta.icon} ${meta.label}</span>
       </div>
 

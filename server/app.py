@@ -16,6 +16,7 @@ from werkzeug.security import check_password_hash
 
 from .store import ROOT, TYPES, connect, initialize, now, public_item
 from .browse import index_entry, page, related
+from .teasers import make_teaser
 
 Image.MAX_IMAGE_PIXELS = 20_000_000
 
@@ -269,6 +270,8 @@ def create_app(config=None):
         if action == 'publish' and draft['name'] == '???':
             abort(400, description='Donnez un nom à la fiche avant de la révéler.')
         publication = public_item(entry_id, draft, action == 'publish') if action != 'hide' else None
+        if action == 'seal':
+            publication['image'] = make_teaser(db(), draft.get('image'))
         previous = json.loads(row['published']) if row['published'] else None
         revealed = row['revealed_at']
         if action == 'publish' and not (previous and previous['known']):
@@ -312,6 +315,17 @@ def create_app(config=None):
     def image(image_id):
         path = '/api/images/'+image_id
         if not session() and not db().execute("SELECT 1 FROM entries WHERE json_extract(published, '$.known')=1 AND json_extract(published, '$.image')=? LIMIT 1", (path,)).fetchone():
+            abort(404)
+        row = db().execute('SELECT body FROM images WHERE id=?', (image_id,)).fetchone()
+        if not row:
+            abort(404)
+        return send_file(io.BytesIO(row['body']), mimetype='image/webp', max_age=0)
+
+    @app.get('/api/teasers/<image_id>')
+    def teaser_image(image_id):
+        # Even a guessed original ID cannot be downloaded through this endpoint.
+        path = '/api/teasers/'+image_id
+        if not db().execute("SELECT 1 FROM entries WHERE json_extract(published, '$.known')=0 AND json_extract(published, '$.image')=? LIMIT 1", (path,)).fetchone():
             abort(404)
         row = db().execute('SELECT body FROM images WHERE id=?', (image_id,)).fetchone()
         if not row:

@@ -4,6 +4,7 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from .browse import migrate_index
+from .teasers import make_teaser
 
 TYPES = ['Lieux', 'Personnages', 'Factions', 'Bestiaire', 'Artefacts', 'Utilitaires', 'Divinités']
 SEALED = 'assets/codex/sealed.svg'
@@ -52,6 +53,14 @@ def initialize(path):
             db.execute("INSERT INTO settings VALUES ('seeded', '1')")
         if version < 2:
             migrate_index(db)
+        if not db.execute("SELECT 1 FROM settings WHERE key='teaser-migration-v1'").fetchone():
+            for row in db.execute("SELECT id,draft,published FROM entries WHERE json_extract(published, '$.known')=0").fetchall():
+                public = json.loads(row['published'])
+                image = make_teaser(db, json.loads(row['draft']).get('image'))
+                if image != public['image']:
+                    public['image'] = image
+                    db.execute('UPDATE entries SET published=?,revision=revision+1 WHERE id=?', (json.dumps(public, ensure_ascii=False), row['id']))
+            db.execute("INSERT INTO settings VALUES ('teaser-migration-v1','1')")
         db.execute('PRAGMA user_version=2')
     if os.name != 'nt':
         os.chmod(path, 0o600)

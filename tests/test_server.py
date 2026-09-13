@@ -128,6 +128,17 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(response.headers['Cache-Control'],'no-store')
         self.action(row,'seal')
         self.assertEqual(self.player.get(url).status_code,404)
+        public = next(e for e in self.catalog() if e['id']==row['id'])
+        self.assertTrue(public['image'].startswith('/api/teasers/'))
+        teaser = self.player.get(public['image'])
+        self.assertEqual(teaser.status_code,200)
+        self.assertEqual(teaser.headers['Cache-Control'],'no-store')
+        self.assertEqual(Image.open(io.BytesIO(teaser.data)).size,(800,400))
+        self.assertNotEqual(teaser.data,response.data)
+        self.assertEqual(self.player.get(url.replace('/api/images/','/api/teasers/')).status_code,404)
+        sealed=self.mj.get('/api/admin/entries/'+row['id']).json
+        self.action(sealed,'hide')
+        self.assertEqual(self.player.get(public['image']).status_code,404)
         bad=self.mj.post('/api/admin/images',data={'image':(io.BytesIO(b'<svg onload="alert(1)"/>'),'bad.svg')},headers={'Origin':'http://localhost','X-CSRF-Token':self.csrf})
         self.assertEqual(bad.status_code,400)
 
@@ -165,6 +176,35 @@ class ServerTests(unittest.TestCase):
         with connect(self.path) as db:
             db.execute("DELETE FROM settings WHERE key='password'")
         self.assertEqual(self.mj.post('/api/login',json={'password':'anything'},headers={'Origin':'http://localhost'}).status_code,503)
+
+    def test_teaser_removes_details_and_migration_does_not_publish_later_drafts(self):
+        from PIL import ImageStat
+        from server.teasers import make_teaser
+        pattern=Image.new('RGB',(800,400))
+        pattern.putdata([((255,200,100) if (x//8+y//8)%2 else (10,30,90)) for y in range(400) for x in range(800)])
+        raw=io.BytesIO();pattern.save(raw,'PNG')
+        source_id='a'*32
+        row=self.create()
+        with connect(self.path) as db:
+            db.execute('INSERT INTO images VALUES (?,?)',(source_id,raw.getvalue()))
+            draft=dict(row['draft'],image='/api/images/'+source_id)
+            from server.store import public_item
+            db.execute('UPDATE entries SET draft=?,published=? WHERE id=?',(json.dumps(draft),json.dumps(public_item(row['id'],draft,False)),row['id']))
+            from server.browse import index_entry
+            index_entry(db,row['id'])
+            db.execute("DELETE FROM settings WHERE key='teaser-migration-v1'")
+        initialize(self.path)
+        image_url=next(e for e in self.catalog() if e['id']==row['id'])['image']
+        self.assertTrue(image_url.startswith('/api/teasers/'))
+        data=self.player.get(image_url).data
+        blurred=Image.open(io.BytesIO(data)).convert('RGB')
+        self.assertLess(sum(ImageStat.Stat(blurred).var),sum(ImageStat.Stat(pattern).var)*.1)
+        with connect(self.path) as db:
+            self.assertEqual(make_teaser(db,'/api/images/'+source_id),image_url)
+            draft['image']=None
+            db.execute('UPDATE entries SET draft=? WHERE id=?',(json.dumps(draft),row['id']))
+        initialize(self.path)
+        self.assertEqual(next(e for e in self.catalog() if e['id']==row['id'])['image'],image_url)
 
 
 if __name__ == '__main__':
