@@ -88,12 +88,12 @@ class ServerTests(unittest.TestCase):
         draft = dict(first['draft'], relations=[second['id'],'noyau'], revision=first['revision'])
         first = self.change('/api/admin/entries/'+first['id'], draft, 'PUT').json
         first = self.action(first, 'publish')
-        item = next(e for e in self.catalog() if e['id']==first['id'])
+        item = self.player.get('/api/entries/'+first['id']).json['entry']
         self.assertEqual(item['relations'], ['noyau'])
         second = self.action(second, 'publish')
-        self.assertIn(second['id'], next(e for e in self.catalog() if e['id']==first['id'])['relations'])
+        self.assertIn(second['id'], self.player.get('/api/entries/'+first['id']).json['entry']['relations'])
         self.action(second, 'seal')
-        self.assertNotIn(second['id'], next(e for e in self.catalog() if e['id']==first['id'])['relations'])
+        self.assertNotIn(second['id'], self.player.get('/api/entries/'+first['id']).json['entry']['relations'])
 
     def test_auth_origin_csrf_logout_and_rate_limit(self):
         self.assertEqual(self.player.get('/api/admin/entries').status_code,401)

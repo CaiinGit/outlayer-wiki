@@ -42,6 +42,26 @@ Python fixées dans `requirements.txt`.
 
 ## Préparer et publier
 
+La liste MJ charge 30 résumés par page. La recherche et les filtres (type, visibilité, ordre)
+portent sur toute la base. Les descriptions et notes privées sont téléchargées seulement
+à l’ouverture d’une fiche. La recherche de liens affiche 10 résultats par page ; les liens
+sélectionnés restent conservés quand on change de recherche ou de page (50 liens maximum).
+Chercher dans la liste ne remplace pas le brouillon actuellement ouvert.
+
+Côté joueurs, une page contient au plus 24 cartes, remplacées au changement de page.
+La recherche couvre les noms, textes, détails et mots-clés des versions publiées uniquement.
+Le tri propose les dernières révélations (connues avant les archives scellées), le nom A–Z,
+ou l’ordre d’ajout. Les filtres et la page sont conservés dans l’adresse pour retrouver
+ou partager une recherche. Les compteurs de progression et les cinq dernières découvertes
+restent globaux. Les images restent chargées progressivement ; les fiches complètes et
+leurs liens ne sont demandés qu’à l’ouverture.
+
+L’index de recherche est créé automatiquement lors du premier démarrage de cette version,
+sans remplacer les données existantes, et actualisé dans la même transaction que chaque
+enregistrement ou publication. Une sauvegarde de l’ancienne version reste restaurable :
+le redémarrage recrée l’index. La recherche utilise une comparaison de texte normalisé
+dans SQLite ; ce n’est pas une promesse de temps constant pour des millions de fiches.
+
 1. Choisir une archive ou cliquer sur **Nouvelle archive**.
 2. Renseigner les champs destinés aux joueurs. Les notes MJ restent dans le champ privé.
 3. Importer éventuellement une image PNG, JPEG ou WebP, puis choisir les archives liées.
@@ -153,3 +173,10 @@ prévisualisation privée, liens filtrés, dates de révélation, contrôle des 
 CSRF, limitation des tentatives, conflits entre onglets, sauvegarde/restauration et fichiers
 privés inaccessibles. Les essais Chrome couvrent aussi le formulaire, l’import, l’aperçu,
 la publication, le scellement, le retrait, la déconnexion et les écrans mobiles.
+
+Les essais de pagination utilisent un catalogue de 1 008 archives : 24 cartes, 30 lignes MJ
+et 10 propositions de liens au maximum. Sur ce jeu de test, la plus grande réponse de liste
+publique mesurée dans Chrome était de 7 312 octets. Ce chiffre dépend de la longueur des
+résumés et ne mesure pas les FPS du serveur de jeu. Les tests couvrent également les recherches
+sur des fiches hors page, les réponses arrivant en retard, les limites de pagination,
+les liens conservés entre plusieurs pages et la migration d’une base existante.

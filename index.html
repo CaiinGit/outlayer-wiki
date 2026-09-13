@@ -8,7 +8,7 @@
   <title>Outlayer — Codex des joueurs</title>
   <link rel="preload" as="image" href="assets/outlayer-landscape-soft.webp" media="(min-width: 721px)">
   <link rel="preload" as="image" href="assets/outlayer-landscape-mobile-soft.webp" media="(max-width: 720px)">
-  <link rel="stylesheet" href="styles.css?v=mj-1">
+  <link rel="stylesheet" href="styles.css?v=pages-1">
 </head>
 <body>
   <a class="skip-link" href="#codex">Aller au codex</a>
@@ -84,7 +84,7 @@
       <div class="codex-toolbar reveal">
         <label class="search-box">
           <span aria-hidden="true">⌕</span>
-          <input id="searchInput" type="search" aria-label="Rechercher dans le codex" placeholder="Rechercher dans le codex…" autocomplete="off">
+          <input id="searchInput" type="search" aria-label="Rechercher dans le codex" placeholder="Rechercher dans le codex…" autocomplete="off" maxlength="200">
         </label>
 
         <div class="filter-row" id="categoryFilters" aria-label="Filtrer par catégorie"></div>
@@ -101,7 +101,7 @@
 
       <div class="results-meta reveal">
         <span id="resultCount" role="status">Chargement des archives…</span>
-        <span class="legend">
+        <span class="browse-order"><label for="sortSelect">Trier</label><select id="sortSelect"><option value="recent">Dernières révélations</option><option value="name">Nom A–Z</option><option value="oldest">Ordre d’ajout</option></select><button type="button" class="filter-button" id="resetFilters">Tout afficher</button></span><span class="legend">
           <i class="legend-dot known"></i> connu
           <i class="legend-dot locked"></i> inconnu
         </span>
@@ -112,7 +112,7 @@
         <button id="retryCatalog" class="filter-button" type="button">Réessayer</button>
       </div>
       <div class="codex-grid" id="codexGrid" aria-busy="true"></div>
-      <div class="catalog-more"><button id="loadMore" class="filter-button" type="button" hidden>Afficher plus d’archives</button></div>
+      <nav id="pagination" class="catalog-pagination" aria-label="Pages du codex" hidden><button type="button" id="previousPage" class="filter-button">← Précédente</button><span id="pageNumber" role="status"></span><button type="button" id="nextPage" class="filter-button">Suivante →</button></nav>
       <noscript><p>Activez JavaScript pour consulter et rechercher les archives.</p></noscript>
 
       <div class="empty-state" id="emptyState" hidden>
@@ -202,8 +202,8 @@
     <div id="dialogContent"></div>
   </dialog>
 
-  <script src="catalog.js?v=mj-1" defer></script>
-  <script src="entry-view.js?v=mj-1" defer></script>
-  <script src="app.js?v=mj-1" defer></script>
+  <script src="catalog.js?v=pages-1" defer></script>
+  <script src="entry-view.js?v=pages-1" defer></script>
+  <script src="app.js?v=pages-1" defer></script>
 </body>
 </html>

@@ -3,6 +3,7 @@ import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
+from .browse import migrate_index
 
 TYPES = ['Lieux', 'Personnages', 'Factions', 'Bestiaire', 'Artefacts', 'Utilitaires', 'Divinités']
 SEALED = 'assets/codex/sealed.svg'
@@ -34,7 +35,7 @@ def initialize(path):
         db.execute('PRAGMA journal_mode=WAL')
         db.execute('BEGIN IMMEDIATE')
         version = db.execute('PRAGMA user_version').fetchone()[0]
-        if version not in (0, 1):
+        if version not in (0, 1, 2):
             raise RuntimeError('Version de base non prise en charge')
         db.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS entries (id TEXT PRIMARY KEY, draft TEXT NOT NULL, published TEXT, revision INTEGER NOT NULL DEFAULT 1, revealed_at TEXT, updated_at TEXT NOT NULL)')
@@ -49,7 +50,9 @@ def initialize(path):
                 published = public_item(item['id'], draft, item['known']) if item['visible'] else None
                 db.execute('INSERT INTO entries VALUES (?, ?, ?, 1, NULL, ?)', (item['id'], json.dumps(draft, ensure_ascii=False), json.dumps(published, ensure_ascii=False) if published else None, now()))
             db.execute("INSERT INTO settings VALUES ('seeded', '1')")
-        db.execute('PRAGMA user_version=1')
+        if version < 2:
+            migrate_index(db)
+        db.execute('PRAGMA user_version=2')
     if os.name != 'nt':
         os.chmod(path, 0o600)
 
@@ -62,21 +65,3 @@ def public_item(entry_id, draft, known=True):
     result = {k: draft[k] for k in ('type', 'name', 'description', 'image', 'subtitle', 'teaser', 'symbol', 'details', 'tags', 'relations')}
     result.update(id=entry_id, known=True, visible=True)
     return result
-
-
-def catalog(db, preview=None):
-    items = []
-    for row in db.execute('SELECT id, published, revealed_at FROM entries ORDER BY rowid'):
-        if preview and row['id'] == preview:
-            draft = db.execute('SELECT draft FROM entries WHERE id=?', (preview,)).fetchone()['draft']
-            item = public_item(row['id'], json.loads(draft))
-        elif row['published']:
-            item = json.loads(row['published'])
-        else:
-            continue
-        item['revealedAt'] = row['revealed_at']
-        items.append(item)
-    known = {e['id'] for e in items if e['known']}
-    for item in items:
-        item['relations'] = [i for i in item.get('relations', []) if i in known and i != item['id']]
-    return dict(version=1, entries=items)

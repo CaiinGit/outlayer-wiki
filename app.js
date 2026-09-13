@@ -2,10 +2,10 @@ const { readCatalog, escapeHTML: escape, normalize } = window.OutlayerCatalog;
 let entries = [];
 let entriesById = new Map();
 const categories = ["Tous", ...window.OutlayerCatalog.TYPES];
-const PAGE_SIZE = 24;
-let shownCount = PAGE_SIZE;
-let catalogReady = false;
-let catalogLoading = false;
+let pageNumber = 1, pageCount = 1, totalEntries = 0;
+let catalogController, detailController, searchTimer, catalogSequence = 0, detailSequence = 0;
+let progress = [], recentEntries = [];
+const previewId = new URLSearchParams(location.search).get("preview");
 
 const grid = document.getElementById("codexGrid");
 const searchInput = document.getElementById("searchInput");
@@ -69,19 +69,6 @@ function setCurrentNavigation(section) {
   });
 }
 
-function filteredEntries() {
-  const query = normalize(searchInput.value.trim());
-  const status = statusSelect.value;
-
-  return entries.filter((entry) => {
-    const categoryMatch = activeCategory === "Tous" || entry.category === activeCategory;
-    const statusMatch = status === "all" || entry.status === status;
-
-    const searchMatch = !query || entry.searchText.includes(query);
-    return categoryMatch && statusMatch && searchMatch;
-  });
-}
-
 function cardTemplate(entry) {
   entry = { ...entry, ...Object.fromEntries(["id", "title", "subtitle", "teaser", "category", "symbol"].map(key => [key, escape(entry[key])])) };
   const meta = statusMeta[entry.status] ?? statusMeta.locked;
@@ -123,17 +110,24 @@ function cardTemplate(entry) {
   `;
 }
 
-function render(reset = true) {
-  if (!catalogReady) return;
-  if (reset) shownCount = PAGE_SIZE;
-  const matches = filteredEntries();
-  if (reset) grid.innerHTML = matches.slice(0, shownCount).map(cardTemplate).join("");
-  else grid.insertAdjacentHTML("beforeend", matches.slice(grid.children.length, shownCount).map(cardTemplate).join(""));
-  emptyState.hidden = matches.length !== 0;
-  const count = Math.min(shownCount, matches.length);
-  resultCount.textContent = count < matches.length ? count + " sur " + matches.length + " entrées" : matches.length + " " + (matches.length > 1 ? "entrées" : "entrée");
-  document.getElementById("loadMore").hidden = count >= matches.length;
+function render() { pageNumber = 1; loadCatalog(); }
+function updatePager(loading = false) {
+  document.getElementById("previousPage").disabled = loading || pageNumber <= 1;
+  document.getElementById("nextPage").disabled = loading || pageNumber >= pageCount;
+  document.getElementById("pageNumber").textContent = "Page " + pageNumber + " sur " + pageCount;
+  document.getElementById("pagination").hidden = totalEntries === 0 || !!previewId;
 }
+function turnPage(direction) {
+  pageNumber = Math.max(1, Math.min(pageCount, pageNumber + direction));
+  loadCatalog(true);
+}
+document.getElementById("previousPage").addEventListener("click", () => turnPage(-1));
+document.getElementById("nextPage").addEventListener("click", () => turnPage(1));
+document.getElementById("sortSelect").addEventListener("change", render);
+document.getElementById("resetFilters").addEventListener("click", () => {
+  document.getElementById("sortSelect").value = "recent";
+  selectCategory("Tous", true);
+});
 
 grid.addEventListener("click", event => {
   const button = event.target.closest(".entry-open:not([disabled])");
@@ -143,63 +137,89 @@ grid.addEventListener("dblclick", event => {
   const card = event.target.closest(".codex-card:not(.status-locked)");
   if (card) openEntry(card.dataset.entryId);
 });
-document.getElementById("loadMore").addEventListener("click", () => {
-  const previous = Math.min(shownCount, filteredEntries().length);
-  shownCount += PAGE_SIZE;
-  render(false);
-  const next = grid.children[previous];
-  if (next) { next.tabIndex = -1; next.focus({ preventScroll: true }); }
-});
 // Failed images leave the decorative background in place.
 document.addEventListener("error", event => {
   if (event.target.matches?.(".card-image, .dialog-image")) event.target.hidden = true;
 }, true);
 
-async function loadCatalog() {
-  if (catalogLoading) return;
-  catalogLoading = true;
+async function fetchJSON(url, signal) {
+  const response = await fetch(url, {cache: "no-store", signal});
+  if (!response.ok) throw Error("Archive indisponible");
+  return response.json();
+}
+async function loadCatalog(moveFocus = false) {
+  clearTimeout(searchTimer);
+  catalogController?.abort();
+  const controller = catalogController = new AbortController();
+  const sequence = ++catalogSequence;
+  const timer = setTimeout(() => controller.abort(), 15000);
   document.getElementById("catalogError").hidden = true;
   grid.setAttribute("aria-busy", "true");
-  resultCount.textContent = "Chargement des archives…";
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  resultCount.textContent = "Recherche dans les archives…";
+  updatePager(true);
   try {
-    const previewId = new URLSearchParams(location.search).get("preview");
-    const endpoint = previewId ? "/api/admin/preview/" + encodeURIComponent(previewId) : "/api/catalog";
-    const response = await fetch(endpoint, { cache: "no-store", signal: controller.signal });
-    if (!response.ok) throw Error("Catalogue indisponible");
-    entries = readCatalog(await response.json());
-    entriesById = new Map(entries.map(entry => [entry.id, entry]));
-    catalogReady = true;
-    buildProgress();
-    buildDiscoveries();
-    render();
-    if (previewId) openEntry(previewId);
-  } catch {
+    const params = new URLSearchParams({page: pageNumber, q: searchInput.value.trim(), state: statusSelect.value, sort: document.getElementById("sortSelect").value});
+    if (activeCategory !== "Tous") params.set("type", activeCategory);
+    let data;
+    if (previewId) {
+      const detail = await fetchJSON("/api/admin/preview/" + encodeURIComponent(previewId), controller.signal);
+      data = {version:1, entries:[detail.entry], total:1, page:1, pages:1, progress:[], recent:[]};
+    } else data = await fetchJSON("/api/catalog?" + params, controller.signal);
+    if (sequence !== catalogSequence) return;
+    entries = readCatalog(data);
+    totalEntries = data.total; pageNumber = data.page; pageCount = data.pages;
+    progress = data.progress; recentEntries = readCatalog({version:1, entries:data.recent});
+    grid.innerHTML = entries.map(cardTemplate).join("");
+    emptyState.hidden = totalEntries !== 0;
+    resultCount.textContent = totalEntries ? ((pageNumber-1)*24+1) + "–" + ((pageNumber-1)*24+entries.length) + " sur " + totalEntries + " archives" : "Aucune archive";
+    buildProgress(); buildDiscoveries();
+    if (!previewId) {
+      params.set("page", pageNumber);
+      history.replaceState(null, "", "?" + params + location.hash);
+    }
+    if (moveFocus) { grid.tabIndex = -1; grid.focus({preventScroll:true}); grid.scrollIntoView({block:"start",behavior:"instant"}); }
+    if (previewId && !dialog.open) openEntry(previewId);
+  } catch (error) {
+    if (sequence !== catalogSequence) return;
+    grid.replaceChildren(); emptyState.hidden = true;
     document.getElementById("catalogError").hidden = false;
-    resultCount.textContent = "Archives indisponibles";
+    resultCount.textContent = "Archives indisponibles · réessayez";
   } finally {
-    clearTimeout(timeout);
-    catalogLoading = false;
-    grid.setAttribute("aria-busy", "false");
+    clearTimeout(timer);
+    if (sequence === catalogSequence) { grid.setAttribute("aria-busy", "false"); updatePager(); }
   }
 }
-document.getElementById("retryCatalog").addEventListener("click", loadCatalog);
+document.getElementById("retryCatalog").addEventListener("click", () => loadCatalog());
 
-function openEntry(id) {
-  const entry = entriesById.get(id);
-  if (!entry || entry.status !== "known") return;
-  dialogContent.innerHTML = window.outlayerEntryView(entry, entriesById);
+async function openEntry(id) {
+  detailController?.abort();
+  const controller = detailController = new AbortController();
+  const sequence = ++detailSequence;
+  const timer = setTimeout(() => controller.abort(), 15000);
+  dialogContent.innerHTML = '<div class="dialog-body"><h2 id="entryTitle">Ouverture de l’archive…</h2><p role="status">Chargement de la fiche</p></div>';
   if (!dialog.open) dialog.showModal();
-  dialog.scrollTop = 0;
+  try {
+    const endpoint = previewId === id ? "/api/admin/preview/" : "/api/entries/";
+    const data = await fetchJSON(endpoint + encodeURIComponent(id), controller.signal);
+    if (sequence !== detailSequence || !dialog.open) return;
+    const documents = readCatalog({version:1, entries:[data.entry, ...data.related]});
+    entriesById = new Map(documents.map(e => [e.id,e]));
+    dialogContent.innerHTML = window.outlayerEntryView(entriesById.get(id), entriesById);
+    dialog.scrollTop = 0;
+  } catch (error) {
+    if (sequence !== detailSequence || !dialog.open) return;
+    dialogContent.innerHTML = '<div class="dialog-body"><h2 id="entryTitle">Archive indisponible</h2><p>Cette fiche ne peut pas être ouverte pour le moment.</p></div>';
+    const retry = document.createElement("button"); retry.type = "button"; retry.className = "filter-button";
+    retry.textContent = "Réessayer"; retry.addEventListener("click", () => openEntry(id)); dialogContent.firstChild.append(retry);
+  } finally { clearTimeout(timer); }
 }
+dialog.addEventListener("close", () => { detailSequence++; detailController?.abort(); entriesById.clear(); dialogContent.replaceChildren(); });
 dialogContent.addEventListener("click", event => {
   const link = event.target.closest("[data-related]");
   if (link) { openEntry(link.dataset.related); dialogClose.focus({preventScroll: true}); }
 });
 function buildDiscoveries() {
-  const recent = entries.filter(e => e.status === "known" && e.revealedAt)
-    .sort((a, b) => Date.parse(b.revealedAt) - Date.parse(a.revealedAt)).slice(0, 5);
+  const recent = recentEntries;
   const list = document.getElementById("recentDiscoveries");
   list.replaceChildren();
   document.getElementById("noDiscoveries").hidden = recent.length !== 0;
@@ -220,18 +240,17 @@ function buildProgress() {
   const trackedCategories = categories.filter((category) => category !== "Tous");
 
   trackedCategories.forEach((category) => {
-    const categoryEntries = entries.filter((entry) => entry.category === category);
-    if (!categoryEntries.length) return;
-
-    const unlocked = categoryEntries.filter((entry) => entry.status !== "locked").length;
-    const ratio = Math.round((unlocked / categoryEntries.length) * 100);
+    const stats = progress.find(item => item.category === category);
+    if (!stats) return;
+    const unlocked = stats.known;
+    const ratio = Math.round(unlocked / stats.total * 100);
 
     const card = document.createElement("article");
     card.className = "progress-card";
     card.innerHTML = `
       <div class="progress-card-head">
         <span>${category}</span>
-        <strong>${unlocked}/${categoryEntries.length}</strong>
+        <strong>${unlocked}/${stats.total}</strong>
       </div>
       <div class="progress-track" aria-label="${ratio}% découvert">
         <span style="width:${ratio}%"></span>
@@ -249,11 +268,15 @@ function closeMenu() {
   menuToggle.setAttribute("aria-label", "Ouvrir le menu");
 }
 
-searchInput.addEventListener("input", render);
+searchInput.addEventListener("input", () => {
+  clearTimeout(searchTimer); catalogSequence++; catalogController?.abort();
+  searchTimer = setTimeout(render, 250);
+});
 statusSelect.addEventListener("change", render);
 
 dialogClose.addEventListener("click", () => dialog.close());
 dialog.addEventListener("click", (event) => {
+  if (event.target !== dialog) return;
   const rect = dialog.getBoundingClientRect();
   const outside =
     event.clientX < rect.left ||
@@ -308,6 +331,12 @@ new ResizeObserver(([record]) => {
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
+const initialParams = new URLSearchParams(location.search);
+searchInput.value = (initialParams.get("q") || "").slice(0, 200);
+activeCategory = categories.includes(initialParams.get("type")) ? initialParams.get("type") : "Tous";
+statusSelect.value = ["all","known","locked"].includes(initialParams.get("state")) ? initialParams.get("state") : "all";
+document.getElementById("sortSelect").value = ["recent","name","oldest"].includes(initialParams.get("sort")) ? initialParams.get("sort") : "recent";
+pageNumber = Math.max(1, Number.parseInt(initialParams.get("page"),10) || 1);
 buildCategoryFilters();
 loadCatalog();
 function setupNavigationTracking() {

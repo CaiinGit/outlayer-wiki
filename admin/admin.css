@@ -57,3 +57,12 @@ dialog::backdrop { background: #000b; }
 .preview-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 20px; height: 70px; }
 iframe { display: block; width: 100%; height: calc(100% - 70px); border: 0; }
 @media(max-width:800px) { header { flex-wrap: wrap; gap: 12px; } header > span { display: none; } .layout { grid-template-columns: 1fr; } #entryList { max-height: 240px; } .two-col,.relations { grid-template-columns: 1fr; } .intro,.editor-heading { flex-direction: column; align-items: start; } .login-panel { padding: 22px; } }
+
+.list-filters label { margin:10px 0; }
+.list-filters select { font-size:13px; padding:8px; }
+.list-pagination { display:flex; justify-content:space-between; gap:8px; margin-top:16px; }
+.list-pagination button { padding:8px; font-size:12px; }
+#listStatus,#relationStatus,#selectedCount { font-size:12px; color:var(--gold); }
+#selectedRelations { display:flex; flex-wrap:wrap; gap:8px; }
+.relation-chip { padding:5px 10px; font-size:13px; }
+#entryList[aria-busy="true"] { opacity:.5; pointer-events:none; }

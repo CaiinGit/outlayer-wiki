@@ -27,7 +27,8 @@ Le codex joueur garde son adresse habituelle.
 - Prévisualisation avec le même rendu que le site joueur.
 - Révéler, mettre à jour, sceller ou retirer une fiche.
 - Liens entre archives connues et cinq dernières découvertes.
-- Recherche sans accents, cartes par lots et chargement progressif des images.
+- Recherche globale sans accents dans SQLite, tri et pagination : 24 cartes côté joueurs,
+  30 résumés côté MJ, 10 résultats pour choisir un lien. Fiches complètes chargées à l’ouverture.
 - Sauvegarde SQLite quotidienne, 14 copies conservées, restauration en ligne de commande.
 
 ## Architecture

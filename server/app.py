@@ -14,7 +14,8 @@ from flask import Flask, abort, g, jsonify, request, send_file, send_from_direct
 from PIL import Image, ImageOps, UnidentifiedImageError
 from werkzeug.security import check_password_hash
 
-from .store import ROOT, TYPES, catalog, connect, initialize, now, public_item
+from .store import ROOT, TYPES, connect, initialize, now, public_item
+from .browse import index_entry, page, related
 
 Image.MAX_IMAGE_PIXELS = 20_000_000
 
@@ -95,7 +96,8 @@ def create_app(config=None):
         published = json.loads(row['published']) if row['published'] else None
         return dict(id=row['id'], draft=json.loads(row['draft']), revision=row['revision'],
                     state='known' if published and published['known'] else 'sealed' if published else 'hidden',
-                    published=published, revealedAt=row['revealed_at'], updatedAt=row['updated_at'])
+                    published=published, revealedAt=row['revealed_at'], updatedAt=row['updated_at'],
+                    relationLabels=related(db(), json.loads(row['draft']).get('relations', []), private=True))
 
     def validate(value, entry_id):
         data = {}
@@ -133,7 +135,39 @@ def create_app(config=None):
     @app.get('/api/catalog')
     @app.get('/data/codex.json')
     def public_catalog():
-        return jsonify(catalog(db()))
+        return browse()
+
+    def browse(private=False, lookup=False):
+        try:
+            number = int(request.args.get('page', '1'))
+        except ValueError:
+            abort(400, description='Numéro de page invalide.')
+        category = request.args.get('type', '')
+        state = request.args.get('state', 'all')
+        sort = request.args.get('sort', 'recent')
+        query = request.args.get('q', '').strip()
+        if category and category not in TYPES or state not in (('all','known','sealed','hidden') if private else ('all','known','locked')) or sort not in (('recent','name') if private else ('recent','name','oldest')) or len(query)>200:
+            abort(400, description='Filtres invalides.')
+        db().execute('BEGIN')
+        return jsonify(page(db(), number=number, query=query, category=category, state=state, sort=sort,
+                            private=private, lookup=lookup, exclude=request.args.get('exclude','') if lookup else ''))
+
+    def detail(row, preview=False):
+        item = public_item(row['id'], json.loads(row['draft'])) if preview else json.loads(row['published']) if row['published'] else None
+        if not item or not item['known']:
+            abort(404, description='Cette archive n’est plus disponible.')
+        links = related(db(), [i for i in item.get('relations', []) if i != row['id']])
+        item['relations'] = [e['id'] for e in links]
+        item['revealedAt'] = row['revealed_at']
+        return jsonify(entry=item, related=links)
+
+    @app.get('/api/entries/<entry_id>')
+    def public_detail(entry_id):
+        db().execute('BEGIN')
+        row = db().execute('SELECT id,published,revealed_at FROM entries WHERE id=?', (entry_id,)).fetchone()
+        if not row:
+            abort(404)
+        return detail(row)
 
     @app.post('/api/login')
     def login():
@@ -183,7 +217,18 @@ def create_app(config=None):
     @app.get('/api/admin/entries')
     @private
     def entries():
-        return jsonify(entries=[serialize(row) for row in db().execute('SELECT * FROM entries ORDER BY updated_at DESC')])
+        return browse(private=True)
+
+    @app.get('/api/admin/lookup')
+    @private
+    def lookup():
+        return browse(private=True, lookup=True)
+
+    @app.get('/api/admin/entries/<entry_id>')
+    @private
+    def admin_detail(entry_id):
+        db().execute('BEGIN')
+        return jsonify(serialize(get_entry(entry_id)))
 
     @app.post('/api/admin/entries')
     @private
@@ -192,6 +237,7 @@ def create_app(config=None):
         entry_id = uuid.uuid4().hex
         draft = validate(data, entry_id)
         db().execute('INSERT INTO entries VALUES (?, ?, NULL, 1, NULL, ?)', (entry_id, json.dumps(draft, ensure_ascii=False), now()))
+        index_entry(db(), entry_id)
         db().commit()
         return jsonify(serialize(get_entry(entry_id))), 201
 
@@ -205,6 +251,7 @@ def create_app(config=None):
         if cursor.rowcount != 1:
             db().rollback()
             abort(409, description='Cette fiche a changé dans un autre onglet. Rechargez la liste avant de modifier à nouveau.')
+        index_entry(db(), entry_id)
         db().commit()
         return jsonify(serialize(get_entry(entry_id)))
 
@@ -228,14 +275,15 @@ def create_app(config=None):
             revealed = now()
         db().execute('UPDATE entries SET published=?, revealed_at=?, revision=revision+1, updated_at=? WHERE id=?',
                      (json.dumps(publication, ensure_ascii=False) if publication else None, revealed, now(), entry_id))
+        index_entry(db(), entry_id)
         db().commit()
         return jsonify(serialize(get_entry(entry_id)))
 
     @app.get('/api/admin/preview/<entry_id>')
     @private
     def preview(entry_id):
-        get_entry(entry_id)
-        return jsonify(catalog(db(), preview=entry_id))
+        db().execute('BEGIN')
+        return detail(get_entry(entry_id), preview=True)
 
     @app.post('/api/admin/images')
     @private
