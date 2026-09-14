@@ -986,3 +986,60 @@ h1 span {
 .access-locked .nav-search, .access-locked .nav-actions > .nav-codex,
 .access-locked .footer-nav a[href^="#"] { display: none; }
 .account-link { color: var(--gold, #d4b474); white-space: nowrap; font-size: 13px; }
+
+/* Campaign navigation: opaque surfaces keep scrolling inexpensive. */
+.topbar {
+  --header-height: 84px;
+  min-height: var(--header-height); padding-inline: clamp(18px, 2.6vw, 52px); gap: 22px;
+  background: linear-gradient(180deg, #191914, #10110f);
+  border-bottom: 1px solid #58472b;
+  box-shadow: 0 1px 0 #090a09, 0 8px 24px #0003;
+}
+.topbar::after { content: ''; position: absolute; bottom: -1px; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, #bd9858, transparent); pointer-events: none; }
+.topbar .brand { flex: 0 0 145px; padding-right: 22px; align-self: center; height: 52px; border-right: 1px solid #79613d44; }
+.topbar .brand::before, .topbar .brand::after { content: none; }
+.topbar .brand img { width: 132px; max-width: 100%; }
+.topbar .main-nav { flex-wrap: nowrap; gap: 4px; }
+.topbar .main-nav a {
+  padding: 14px 11px; border-radius: 5px; font-size: 12px; letter-spacing: .075em;
+  color: #c0b8a6; transition: color .16s ease, background-color .16s ease;
+}
+.topbar .main-nav a[href]:hover { color: #f5e4bf; background: #d7b46c0b; }
+.topbar .main-nav a[aria-current] { color: #f0d297; background: linear-gradient(180deg, #c7a05e15, #c7a05e05); }
+.topbar .main-nav a[aria-current]::before { bottom: 0; left: 12px; right: 12px; background: linear-gradient(90deg, transparent, #c7a05e, transparent); }
+.topbar .main-nav a[aria-current]::after { bottom: -2px; width: 4px; height: 4px; left: calc(50% - 2px); }
+.topbar .main-nav a[aria-disabled] { color: #928d80; }
+.topbar .nav-actions { gap: 10px; }
+.topbar .nav-search { width: 38px; height: 40px; border: 1px solid transparent; border-radius: 5px; color: #b9a582; }
+.topbar .nav-search:hover { color: #f0d297; border-color: #78603d66; background: #c7a05e0a; }
+.topbar .account-link { padding: 11px 13px; border: 1px solid #5b514033; border-radius: 5px; color: #c6bcaa; font-size: 12px; letter-spacing: .025em; }
+.topbar .account-link:hover { color: #f4dfb5; border-color: #80643a; background: #c7a05e0a; }
+.topbar .nav-codex { min-height: 42px; padding: 0 18px; gap: 9px; outline: none; border: 1px solid #b49358; border-radius: 5px; background: linear-gradient(135deg, #d5b779, #b78e4d); color: #211b11; font-size: 12px; letter-spacing: .1em; font-weight: 700; box-shadow: inset 0 1px 0 #fbe0a888, 0 3px 10px #0003; }
+.topbar .nav-codex span { font-size: 24px; }
+.topbar .nav-codex:hover { background: linear-gradient(135deg, #e5c98c, #c89f5b); border-color: #e8c88b; }
+.topbar .menu-toggle { border: 1px solid #615137; border-radius: 5px; background: #201e17; }
+.topbar .menu-toggle[aria-expanded="true"] { background: #362d1e; border-color: #b49358; }
+@media (min-width: 1081px) and (max-width: 1280px) {
+  .topbar { gap: 12px; padding-inline: 20px; }
+  .topbar .brand { flex-basis: 120px; padding-right: 12px; }
+  .topbar .main-nav { gap: 0; }
+  .topbar .main-nav a { padding-inline: 8px; font-size: 11px; }
+  .topbar .nav-actions { gap: 6px; }
+  .topbar .account-link { padding-inline: 9px; }
+}
+@media (max-width: 1080px) {
+  .topbar { --header-height: 76px; }
+  .topbar .main-nav { padding: 16px 20px 22px; gap: 8px; background: #11120f; border-bottom: 1px solid #79613d; box-shadow: 0 16px 24px #0005; max-height: calc(100svh - var(--header-size, 76px)); }
+  .topbar .main-nav a { padding: 17px 16px; border: 1px solid #76623d26; border-radius: 6px; }
+  .topbar .main-nav a[aria-disabled]::after { content: 'À venir'; display: block; margin-top: 5px; font-size: 9px; letter-spacing: .06em; color: #847454; }
+}
+@media (max-width: 720px) {
+  .topbar { --header-height: 68px; padding-inline: 12px; gap: 10px; }
+  .topbar .brand { flex: 0 1 108px; min-width: 75px; padding: 0; height: 48px; border: 0; }
+  .topbar .brand img { width: 108px; }
+  .topbar .nav-actions { gap: 6px; }
+  .topbar .account-link { padding: 11px 8px; font-size: 11px; }
+  .topbar .nav-codex { padding-inline: 10px; min-height: 40px; font-size: 11px; }
+  .topbar .menu-toggle { width: 40px; height: 40px; flex-shrink: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .topbar .main-nav a { transition: none; } }
