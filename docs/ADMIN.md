@@ -69,6 +69,16 @@ une liste de prérequis et des coordonnées : le clavier suffit donc pour organi
 l’arbre. Les flèches du clavier déplacent l’icône ciblée. Les boucles sont refusées.
 Chaque compétence peut exiger tous ses prérequis ou au moins un d’entre eux.
 
+La poignée dorée en bas à droite de chaque icône permet de la redimensionner à la
+souris (32 à 192 pixels). Les touches + et - font de même sur l’icône ciblée. Le centre
+reste fixe, la forme est conservée et les liens suivent sa nouvelle taille.
+Enregistrez puis publiez pour transmettre cette taille aux joueurs. Les anciennes
+compétences gardent leur taille de 64 pixels. Annuler/rétablir fonctionne aussi pour
+le redimensionnement.
+
+Au survol côté joueur, la fiche suit le curseur en restant dans l’écran. Un clic fixe
+la fiche pour lire, faire défiler son contenu ou interagir avec ses boutons.
+
 Renseignez description, obtention, utilisation, coût, recharge, portée et points de
 déblocage. Les formes distinguent les compétences actives, passives et ultimes.
 Vous pouvez importer des icônes ; elles sont converties en WebP de 128 pixels maximum.

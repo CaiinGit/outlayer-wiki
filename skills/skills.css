@@ -26,6 +26,11 @@
 .skill-board:active { cursor:grabbing; }
 .skill-board.has-artwork { background-size:cover,cover; background-repeat:no-repeat,no-repeat; background-position:center,center; }
 .skill-node.active { border-radius:2px; }
+.skill-board .skill-node { width:var(--node-size,64px); height:var(--node-size,64px); }
+.skill-node .skill-face { width:calc(var(--node-size,64px) - 12px); height:calc(var(--node-size,64px) - 12px); font-size:calc(var(--node-size,64px) * .47); }
+.skill-node .skill-node-name { top:calc(var(--node-size,64px) + 8px); }
+.skill-resize { position:absolute; right:-7px; bottom:-7px; width:15px; height:15px; border:2px solid #f3d897; border-radius:2px; background:#80652e; cursor:nwse-resize; z-index:2; touch-action:none; }
+.linking .skill-resize { display:none; }
 .skill-board.linking { cursor:crosshair; }
 .skill-world { position:absolute; width:2400px; height:1800px; top:0; left:0; transform-origin:0 0; }
 .skill-lines { position:absolute; inset:0; width:2400px; height:1800px; overflow:visible; pointer-events:none; }

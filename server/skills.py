@@ -44,6 +44,9 @@ def validate_graph(value,db):
             pos=node.get(key,120)
             if type(pos) is not int or not 60<=pos<=maximum-60:abort(400,description='Placez les compétences à l’intérieur de l’arbre.')
             n[key]=pos
+        node_size=node.get('size',64)
+        if type(node_size) is not int or not 32<=node_size<=192:abort(400,description='La taille doit être comprise entre 32 et 192 pixels.')
+        n['size']=node_size
         points=node.get('points',1)
         if type(points) is not int or not 0<=points<=999:abort(400,description='Le coût de déblocage doit être compris entre 0 et 999 points.')
         kind=node.get('kind','active');mode=node.get('requirement_mode','all')

@@ -4,15 +4,16 @@ let tree=null,selected=null,learned=new Set(),page=1,pages=1,controller,affinity
 const names={active:'Active',passive:'Passive',ultimate:'Ultime'};
 const board=new SkillGraph.Board($('treeBoard'),{onSelect:id=>openCard(id,true),onZoom:z=>$('zoomValue').textContent=Math.round(z*100)+' %'});
 async function api(path,signal){const response=await fetch(path,{cache:'no-store',signal});const data=await response.json();if(!response.ok)throw Error(data.error||'Les Affinités sont indisponibles.');return data;}
-let cardTimer,pinned=false;
+let cardTimer,pinned=false,cardPointer=null,cardFrame=null;
 const card=$('skillInspector');
-function closeCard(){clearTimeout(cardTimer);card.hidden=true;pinned=false;selected=null;board.selected=null;board.states();}
-function positionCard(){const anchor=board.buttons.get(selected);if(!anchor)return;const rect=anchor.getBoundingClientRect(),top=document.querySelector('.topbar').getBoundingClientRect().bottom+10;const w=card.offsetWidth,h=card.offsetHeight;let x=rect.right+18;if(x+w>innerWidth-12)x=rect.left-w-18;card.style.left=Math.max(12,Math.min(x,innerWidth-w-12))+'px';card.style.top=Math.max(top,Math.min(rect.top-20,innerHeight-h-12))+'px';}
+function closeCard(){clearTimeout(cardTimer);if(cardFrame)cancelAnimationFrame(cardFrame);cardFrame=null;cardPointer=null;card.hidden=true;pinned=false;selected=null;board.selected=null;board.states();}
+function positionCard(){const anchor=board.buttons.get(selected);if(!anchor)return;const rect=anchor.getBoundingClientRect(),top=document.querySelector('.topbar').getBoundingClientRect().bottom+10;const w=card.offsetWidth,h=card.offsetHeight;const cursor=!pinned&&cardPointer;let x=cursor?cursor.x+rect.width+18:rect.right+18;if(x+w>innerWidth-12)x=cursor?cursor.x-w-rect.width-18:rect.left-w-18;card.style.left=Math.max(12,Math.min(x,innerWidth-w-12))+'px';card.style.top=Math.max(top,Math.min(cursor?cursor.y+18:rect.top-20,innerHeight-h-12))+'px';}
 function openCard(id,pin=false){clearTimeout(cardTimer);if(pinned&&!pin)return;selected=id;pinned=pin;board.selected=id;board.states();showSkill();card.hidden=false;positionCard();}
 function scheduleClose(){clearTimeout(cardTimer);if(!pinned)cardTimer=setTimeout(()=>{if(!card.matches(':hover')&&!card.contains(document.activeElement))closeCard();},180);}
-$('treeBoard').addEventListener('pointerover',e=>{const node=e.target.closest('.skill-node');if(node&&e.pointerType!=='touch'&&innerWidth>=700)openCard(node.dataset.id);});
+$('treeBoard').addEventListener('pointerover',e=>{const node=e.target.closest('.skill-node');if(node&&e.pointerType!=='touch'&&innerWidth>=700){cardPointer={x:e.clientX,y:e.clientY};openCard(node.dataset.id);}});
+$('treeBoard').addEventListener('pointermove',e=>{if(pinned||card.hidden||e.pointerType==='touch'||!e.target.closest('.skill-node'))return;cardPointer={x:e.clientX,y:e.clientY};if(!cardFrame)cardFrame=requestAnimationFrame(()=>{cardFrame=null;if(!card.hidden)positionCard();});});
 $('treeBoard').addEventListener('pointerout',e=>{if(e.target.closest('.skill-node')&&!e.relatedTarget?.closest?.('.skill-node'))scheduleClose();});
-$('treeBoard').addEventListener('focusin',e=>{const node=e.target.closest('.skill-node');if(node&&node.matches(':focus-visible'))openCard(node.dataset.id);});
+$('treeBoard').addEventListener('focusin',e=>{const node=e.target.closest('.skill-node');if(node&&node.matches(':focus-visible')){cardPointer=null;openCard(node.dataset.id);}});
 $('treeBoard').addEventListener('focusout',scheduleClose);
 $('treeBoard').addEventListener('pointerdown',e=>{if(!e.target.closest('.skill-node'))closeCard();});
 $('treeBoard').addEventListener('wheel',closeCard,{passive:true});

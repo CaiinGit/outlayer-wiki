@@ -61,6 +61,18 @@ class SkillsTests(test_server.ServerTests):
         self.assertNotIn('draft',data['items'][0])
         self.assertEqual(self.player.get('/api/affinities').json['total'],0)
 
+    def test_node_size_round_trip_and_legacy_default(self):
+        row=self.create_tree()
+        self.assertEqual(row['draft']['nodes'][0]['size'],64)
+        graph=self.graph();graph['nodes'][0]['size']=128
+        row=self.create_tree(graph)
+        path='/api/admin/affinities/'+row['id']
+        self.change(path+'/publish',dict(revision=row['revision']))
+        self.assertEqual(self.player.get('/api/affinities/'+row['id']).json['tree']['nodes'][0]['size'],128)
+        for size in [31,193,True,'64',64.5]:
+            graph['nodes'][0]['size']=size
+            self.assertEqual(self.change('/api/admin/affinities',graph).status_code,400)
+
 
 for name in dir(test_server.ServerTests):
     if name.startswith('test_'):setattr(SkillsTests,name,None)
