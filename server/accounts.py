@@ -178,13 +178,22 @@ def register_accounts(app, db, private, payload):
         row = db().execute('SELECT * FROM users WHERE id=?', (user_id,)).fetchone()
         if not row:
             abort(404)
+        username = data.get('username', row['username'])
+        if username != row['username'] and (not isinstance(username, str) or not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_.-]{2,39}', username)):
+            abort(400, description='Identifiant : 3 à 40 lettres, chiffres, points, tirets ou underscores.')
         role, active = data.get('role', row['role']), data.get('active', bool(row['active']))
         if role not in ROLES or not isinstance(active, bool):
             abort(400, description='Rôle ou état invalide.')
         if row['role']=='mj' and row['active'] and (role!='mj' or not active):
             if db().execute("SELECT count(*) FROM users WHERE role='mj' AND active=1").fetchone()[0] <= 1:
                 abort(409, description='Conservez au moins un compte MJ actif.')
-        db().execute('UPDATE users SET role=?,active=?,password=? WHERE id=?', (role, int(active), hashed or row['password'], user_id))
-        db().execute('DELETE FROM sessions WHERE user_id=?', (user_id,))
+        try:
+            db().execute('UPDATE users SET username=?,role=?,active=?,password=? WHERE id=?', (username, role, int(active), hashed or row['password'], user_id))
+        except sqlite3.IntegrityError:
+            db().rollback()
+            abort(409, description='Cet identifiant est déjà utilisé.')
+        revoked = role != row['role'] or active != bool(row['active']) or hashed is not None
+        if revoked:
+            db().execute('DELETE FROM sessions WHERE user_id=?', (user_id,))
         db().commit()
-        return jsonify(ok=True)
+        return jsonify(ok=True, sessionsRevoked=revoked)

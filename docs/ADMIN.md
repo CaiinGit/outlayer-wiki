@@ -44,7 +44,7 @@ Aucun mot de passe n’est fourni par défaut ou enregistré dans GitHub.
 3. Le joueur se reconnecte pour entrer dans le codex. Les changements de rôle, désactivations
    et réinitialisations de mot de passe ferment les sessions du compte concerné.
 
-Le MJ peut créer des comptes, changer leur rôle, désactiver leur accès ou définir un nouveau
+Le MJ peut créer des comptes, modifier leur identifiant, changer leur rôle, désactiver leur accès ou définir un nouveau
 mot de passe. Attribuer le rôle MJ donne tous les droits ; l’interface demande confirmation.
 Le dernier compte MJ actif ne peut pas être désactivé ou rétrogradé. Chaque utilisateur peut
 changer son mot de passe depuis **Mon compte**, en fournissant son mot de passe actuel.
@@ -228,3 +228,13 @@ publique mesurée dans Chrome était de 7 312 octets. Ce chiffre dépend de la l
 résumés et ne mesure pas les FPS du serveur de jeu. Les tests couvrent également les recherches
 sur des fiches hors page, les réponses arrivant en retard, les limites de pagination,
 les liens conservés entre plusieurs pages et la migration d’une base existante.
+
+### Modifier un identifiant
+
+Dans **Atelier → Comptes**, modifier le champ **Identifiant**, puis cliquer sur **Enregistrer**.
+Le nom doit contenir 3 à 40 lettres, chiffres, points, tirets ou underscores et être unique
+(sans distinction entre majuscules et minuscules). Le compte initial `mj` peut garder son nom court.
+Un changement de nom seul conserve le mot de passe, les droits et les sessions ouvertes, y compris
+si le MJ renomme son propre compte. La prochaine connexion utilise le nouvel identifiant.
+La commande de récupération `set-password` cible toujours le nom `mj` ; si vous avez renommé ce
+compte, elle crée ou réactive un accès MJ sous ce nom sans renommer votre compte existant.

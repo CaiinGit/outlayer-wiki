@@ -6,6 +6,29 @@ from werkzeug.security import generate_password_hash
 
 
 class AccountTests(test_server.ServerTests):
+    def test_rename_preserves_identity_password_and_session(self):
+        before=self.player.get('/api/session').json['user']
+        response=self.change('/api/admin/users/player-test',{'username':'Valentin'},'PUT')
+        self.assertEqual(response.status_code,200)
+        self.assertFalse(response.json['sessionsRevoked'])
+        after=self.player.get('/api/session').json['user']
+        self.assertEqual(after,dict(before,username='Valentin'))
+        client=self.app.test_client()
+        for name,code in [('player',401),('valentin',200)]:
+            self.assertEqual(client.post('/api/login',json={'username':name,'password':'player-password-only'},headers={'Origin':'http://localhost'}).status_code,code)
+        mj=self.mj.get('/api/session').json['user']
+        self.assertEqual(self.change('/api/admin/users/'+mj['id'],{'username':'GameMaster'},'PUT').status_code,200)
+        self.assertEqual(self.mj.get('/api/admin/users').status_code,200)
+
+    def test_rename_validation_conflict_and_permission(self):
+        self.change('/api/admin/users',{'username':'Taken','password':'another-password','role':'guest'})
+        for name,code in [('taken',409),('',400),('ab',400),('name with spaces',400),('x'*41,400),(None,400)]:
+            self.assertEqual(self.change('/api/admin/users/player-test',{'username':name,'role':'mj'},'PUT').status_code,code)
+        self.assertEqual(self.player.get('/api/session').json['user']['username'],'player')
+        self.assertEqual(self.player.get('/api/session').json['user']['role'],'player')
+        csrf=self.player.get('/api/session').json['csrf']
+        self.assertEqual(self.player.put('/api/admin/users/player-test',json={'username':'NewName'},headers={'Origin':'http://localhost','X-CSRF-Token':csrf}).status_code,403)
+
     def signup(self, name='new-player'):
         client=self.app.test_client()
         response=client.post('/api/register', json={'username':name,'password':'new-password-only','role':'mj'},headers={'Origin':'http://localhost'})

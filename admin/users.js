@@ -12,7 +12,7 @@ async function loadUsers(){
   node('usersPrev').disabled=userPage<=1;node('usersNext').disabled=userPage>=pages;node('usersList').replaceChildren();
   for(const user of data.users){
     const form=document.createElement('form');form.className='user-row';
-    const title=document.createElement('h2');title.textContent=user.username;
+    const title=document.createElement('label');title.textContent='Identifiant';const username=document.createElement('input');username.name='username';username.value=user.username;username.required=true;username.minLength=user.username==='mj'?2:3;username.maxLength=40;username.pattern=(user.username==='mj'?'mj|':'')+'[a-zA-Z0-9][a-zA-Z0-9_.\\-]{2,39}';username.autocomplete='off';title.append(username);
     const roleLabel=document.createElement('label');roleLabel.textContent='Rôle';const role=document.createElement('select');
     for(const [value,label] of Object.entries(roles))role.add(new Option(label,value));role.value=user.role;roleLabel.append(role);
     const activeLabel=document.createElement('label');activeLabel.textContent='Accès';const active=document.createElement('select');active.add(new Option('Actif','1'));active.add(new Option('Désactivé','0'));active.value=String(user.active);activeLabel.append(active);
@@ -21,7 +21,7 @@ async function loadUsers(){
     form.addEventListener('submit',async event=>{event.preventDefault();
       if(role.value==='mj' && user.role!=='mj' && !confirm('Accorder l’accès total du MJ à '+user.username+' ?'))return;
       save.disabled=true;
-      try{const update={role:role.value,active:active.value==='1'};if(password.value)update.password=password.value;await usersApi('/api/admin/users/'+user.id,'PUT',update);password.value='';await loadUsers();node('usersNotice').textContent='Compte mis à jour. Ses anciennes sessions sont fermées.';}
+      try{const update={username:username.value,role:role.value,active:active.value==='1'};if(password.value)update.password=password.value;const result=await usersApi('/api/admin/users/'+user.id,'PUT',update);password.value='';await loadUsers();node('usersNotice').textContent=result.sessionsRevoked?'Compte mis à jour. Ses anciennes sessions sont fermées.':'Compte mis à jour. Le nouvel identifiant est utilisable dès maintenant ; le mot de passe reste inchangé.';}
       catch(error){node('usersNotice').textContent=error.message;}finally{save.disabled=false;}
     });node('usersList').append(form);
   }
