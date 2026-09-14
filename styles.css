@@ -834,12 +834,12 @@ h1 span {
 .nav-codex:hover { background: #272117; border-color: #d0a668; }
 .menu-toggle { display: none; width: 44px; height: 44px; padding: 10px; background: transparent; border: 1px solid var(--gold-dim); cursor: pointer; }
 .menu-toggle span { display: block; height: 1px; margin: 5px 0; background: var(--gold-bright); }
-.parallax-hero { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-rows: 1fr auto; min-height: max(600px, calc(100svh - var(--header-size, var(--header-height)))); background: #282a28; }
+.parallax-hero { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-rows: 1fr auto; min-height: max(600px, calc(100svh - var(--header-size, var(--header-height)))); background: #10110f; }
 .parallax-hero-bg {
   position: absolute;
-  inset: -40px 0;
+  inset: 0 0 32px;
   z-index: -3;
-  background: url('assets/outlayer-landscape-soft.webp') center / cover no-repeat;
+  background: url('assets/outlayer-landscape-soft.webp') center / contain no-repeat;
 }
 
 /* Static by default. Supporting browsers can move this single, unfiltered layer
@@ -926,7 +926,7 @@ h1 span {
   .nav-codex { min-height: 38px; padding: 0 10px; font-size: .75rem; letter-spacing: .08em; }
   .nav-codex span, .nav-search { display: none; }
   .parallax-hero { min-height: max(520px, calc(100svh - var(--header-size, var(--header-height)))); }
-  .parallax-hero-bg { inset: 0; background-image: url('assets/outlayer-landscape-mobile-soft.webp'); background-position: 58% center; }
+  .parallax-hero-bg { inset: 0; background-image: url('assets/outlayer-landscape-mobile-soft.webp'); background-position: center; }
   .parallax-hero-content { width: calc(100% - 36px); padding: 50px 0 65px; }
   .outlayer-wordmark { width: min(500px, 92vw); }
   .parallax-subtitle { font-size: 1rem; letter-spacing: .18em; margin-top: 22px; }
