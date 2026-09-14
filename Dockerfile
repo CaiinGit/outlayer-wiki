@@ -8,6 +8,7 @@ COPY server ./server
 COPY data ./data
 COPY assets ./assets
 COPY admin ./admin
+COPY journal ./journal
 COPY index.html app.js catalog.js entry-view.js styles.css ./
 USER outlayer
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 OUTLAYER_DB=/data/outlayer.sqlite

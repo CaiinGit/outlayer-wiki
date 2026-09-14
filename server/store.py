@@ -6,6 +6,7 @@ from pathlib import Path
 from .browse import migrate_index
 from .teasers import make_teaser
 from .accounts import migrate_accounts
+from .journal import migrate_journal
 
 TYPES = ['Lieux', 'Personnages', 'Factions', 'Bestiaire', 'Artefacts', 'Utilitaires', 'Divinités']
 SEALED = 'assets/codex/sealed.svg'
@@ -37,7 +38,7 @@ def initialize(path):
         db.execute('PRAGMA journal_mode=WAL')
         db.execute('BEGIN IMMEDIATE')
         version = db.execute('PRAGMA user_version').fetchone()[0]
-        if version not in (0, 1, 2, 3):
+        if version not in (0, 1, 2, 3, 4):
             raise RuntimeError('Version de base non prise en charge')
         db.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS entries (id TEXT PRIMARY KEY, draft TEXT NOT NULL, published TEXT, revision INTEGER NOT NULL DEFAULT 1, revealed_at TEXT, updated_at TEXT NOT NULL)')
@@ -63,7 +64,8 @@ def initialize(path):
                     db.execute('UPDATE entries SET published=?,revision=revision+1 WHERE id=?', (json.dumps(public, ensure_ascii=False), row['id']))
             db.execute("INSERT INTO settings VALUES ('teaser-migration-v1','1')")
         migrate_accounts(db)
-        db.execute('PRAGMA user_version=3')
+        migrate_journal(db)
+        db.execute('PRAGMA user_version=4')
     if os.name != 'nt':
         os.chmod(path, 0o600)
 

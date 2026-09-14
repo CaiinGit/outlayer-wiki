@@ -25,6 +25,10 @@ les fichiers montés par Nginx et conserve les volumes de données.
 
 ## Fonctions
 
+- Journal de campagne sur `/sessions/` : Fables → Arcs → Sessions, récits et dates.
+- Gestion depuis **Atelier → Sessions** : création, modification, ordre, visibilité et suppression.
+- Fable **I**, **Arc 1** (renommable), **Session 1** et **Session 2** initialisés une seule fois, sans récit inventé.
+
 - Comptes MJ, joueur et invité ; inscription puis validation par le MJ.
 - Accueil ouvert, codex réservé aux joueurs validés et au MJ.
 - Gestion des comptes paginée, désactivation et réinitialisation des mots de passe.

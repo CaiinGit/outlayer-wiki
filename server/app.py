@@ -15,6 +15,7 @@ from .store import ROOT, TYPES, connect, initialize, now, public_item
 from .browse import index_entry, page, related
 from .teasers import make_teaser
 from .accounts import current_session, register_accounts
+from .journal import register_journal
 
 Image.MAX_IMAGE_PIXELS = 20_000_000
 
@@ -64,10 +65,10 @@ def create_app(config=None):
     @app.before_request
     def protect_codex():
         path = request.path
-        if path in ('/api/catalog', '/data/codex.json') or path.startswith(('/api/entries/', '/api/images/', '/api/teasers/', '/assets/codex/')):
+        if path in ('/api/catalog', '/data/codex.json', '/api/journal') or path.startswith(('/api/entries/', '/api/images/', '/api/teasers/', '/assets/codex/', '/api/journal/')):
             auth = session()
             if not auth:
-                abort(401, description='Connectez-vous pour consulter le codex.')
+                abort(401, description='Connectez-vous pour consulter la campagne.')
             if auth['role'] not in ('mj', 'player'):
                 abort(403, description='Votre compte invité attend la validation du MJ.')
 
@@ -180,6 +181,7 @@ def create_app(config=None):
         return detail(row)
 
     register_accounts(app, db, private, payload)
+    register_journal(app, db, private, payload)
 
     @app.get('/api/admin/session')
     @private
@@ -325,8 +327,14 @@ def create_app(config=None):
     def account_page():
         return send_from_directory(ROOT / 'admin', 'account.html')
 
+    @app.get('/sessions/')
+    def sessions_page():
+        return send_from_directory(ROOT / 'journal', 'index.html')
+
     @app.get('/<path:name>')
     def static_file(name):
+        if name in ('journal/journal.css','journal/public.js','admin/journal.html','admin/journal.js'):
+            return send_from_directory(ROOT,name)
         if name in ('styles.css', 'app.js', 'catalog.js', 'entry-view.js', 'admin/admin.js', 'admin/admin.css', 'admin/account.html', 'admin/account.js', 'admin/users.html', 'admin/users.js') or (name.startswith('assets/') and '..' not in Path(name).parts):
             return send_from_directory(ROOT, name)
         abort(404)

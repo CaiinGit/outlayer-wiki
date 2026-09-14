@@ -1,0 +1,35 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Sessions — Outlayer</title><link rel="stylesheet" href="/styles.css?v=journal-1"><link rel="stylesheet" href="/journal/journal.css?v=journal-1"><script src="/journal/public.js?v=journal-1" defer></script></head><body class="journal-page">
+<a class="skip-link" href="#journalLayout">Aller au journal</a>
+  <header class="topbar">
+    <a href="/" class="brand" aria-label="Outlayer — Accueil">
+      <img src="/assets/outlayer-logo-original.png" width="1024" height="397" alt="Outlayer">
+    </a>
+
+    <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
+      <a href="/" data-section="accueil">Accueil</a>
+      <a href="/sessions/" data-section="sessions" aria-current="page">Sessions</a>
+      <a role="link" aria-disabled="true" aria-label="Chronologie — à venir" title="À venir">Chronologie</a>
+      <a role="link" aria-disabled="true" aria-label="Compétences — à venir" title="À venir">Compétences</a>
+      <a role="link" aria-disabled="true" aria-label="Maîtrises — à venir" title="À venir">Maîtrises</a>
+      <a role="link" aria-disabled="true" aria-label="Coffre — à venir" title="À venir">Coffre</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="nav-search" href="/#searchInput" aria-label="Rechercher dans le codex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg>
+      </a>
+      <a class="account-link" href="/account/">Connexion</a>
+      <a class="nav-codex" href="/#codex" data-category="Tous"><span aria-hidden="true">✧</span> Codex</a>
+    </div>
+  </header>
+<main><section id="journalHero" class="journal-hero" hidden><p class="kicker">LE JOURNAL DE CAMPAGNE</p><h1>Chaque session,<br><em>une page de votre histoire.</em></h1><p>Retrouvez le fil de l’aventure. Des grandes Fables aux récits de chaque session, vos souvenirs prennent place ici.</p><a id="manageJournal" href="/admin/journal.html" class="account-link" hidden>Écrire dans le journal · Atelier du MJ ↗</a></section>
+<section id="accessGate" class="section" hidden><div class="journal-empty"><h1>Le journal attend ses joueurs.</h1><p>Connectez-vous avec un compte joueur validé pour retrouver les sessions de la campagne.</p><a href="/account/">Se connecter →</a></div></section>
+<p id="journalNotice" role="status" aria-live="polite"></p>
+<div id="journalLayout" class="journal-layout" hidden><aside class="journal-sidebar"><h2>Les Fables</h2><nav id="fableList" class="fable-list" aria-label="Choisir une Fable"></nav><nav id="fablePager" class="journal-pager" aria-label="Pages des Fables"></nav><p class="journal-caption">Une Fable rassemble plusieurs Arcs.<br>Chaque Arc se raconte au fil des Sessions.</p></aside>
+<div><p id="journalEmpty" class="journal-empty" hidden>La première Fable n’a pas encore été partagée.</p><section id="journalContent"><div class="journal-heading"><div><p class="journal-breadcrumb">FABLES / ARCS / SESSIONS</p><h2 id="fableTitle"></h2><p id="fableDescription" class="journal-description"></p></div><span id="fableMark" class="journal-mark" aria-hidden="true"></span></div><nav id="arcList" class="arc-list" aria-label="Choisir un Arc"></nav><nav id="arcPager" class="journal-pager" aria-label="Pages des Arcs"></nav><div class="arc-heading"><h3 id="arcTitle"></h3><p id="arcDescription" class="journal-description"></p><p id="sessionCount" class="journal-caption"></p></div><div id="sessionList" class="session-timeline"></div><nav id="sessionPager" class="journal-pager" aria-label="Pages des Sessions"></nav></section></div></div></main>
+<footer class="footer"><span>OUTLAYER — Journal de campagne</span><a href="/#codex">Retour au codex</a></footer>
+<dialog id="sessionDialog" class="journal-dialog" aria-labelledby="sessionTitle"><button id="closeSession" type="button">Fermer ×</button><p class="kicker">RÉCIT DE SESSION</p><h2 id="sessionTitle"></h2><p id="sessionInfo" class="journal-caption"></p><div id="sessionBody" class="journal-description"></div></dialog>
+</body></html>

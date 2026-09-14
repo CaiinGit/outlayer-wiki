@@ -17,6 +17,7 @@ services:
       - ./entry-view.js:/usr/share/nginx/html/entry-view.js:ro
       - ./assets:/usr/share/nginx/html/assets:ro
       - ./admin:/usr/share/nginx/html/admin:ro
+      - ./journal:/usr/share/nginx/html/journal:ro
   api:
     build: .
     restart: unless-stopped

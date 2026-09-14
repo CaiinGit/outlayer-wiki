@@ -55,7 +55,38 @@ Les mots de passe sont hachés ; les cookies de session sont HttpOnly et les mod
 exigent un jeton CSRF. Les inscriptions sont limitées à 5 par heure par adresse vue par l’API,
 et les connexions à 8 échecs par tranche de 15 minutes. Derrière le proxy actuel, ces limites
 peuvent être partagées par les visiteurs. Les comptes sont inclus dans les sauvegardes SQLite
-(schéma 3) ; les sauvegardes des schémas 1 et 2 restent restaurables et sont migrées au démarrage.
+(schéma 4) ; les sauvegardes des schémas 1, 2 et 3 restent restaurables et sont migrées au démarrage.
+
+## Journal des sessions
+
+Les joueurs et le MJ ouvrent **Sessions** dans la navbar pour consulter `/sessions/`.
+La navigation conserve les mêmes liens que l’accueil. Les invités n’ont pas accès au journal.
+La lecture est organisée en **Fables → Arcs → Sessions** : choisissez une Fable à gauche,
+un Arc, puis **Lire le récit**. Le récit complet est chargé à l’ouverture, avec ses retours
+à la ligne ; le contenu est du texte simple, sans HTML exécutable.
+
+Dans **Atelier → Sessions** (`/admin/journal.html`) :
+
+1. **Nouvelle Fable** crée une partie de campagne. **Voir les Arcs** permet d’y créer ses Arcs.
+2. **Voir les Sessions** ouvre les sessions d’un Arc. **Nouvelle Session** ajoute une fiche.
+3. **Modifier** permet de changer le titre, l’ordre et la description. Une session possède
+   aussi une date facultative et un état **Jouée / À venir**.
+4. Cocher **Visible aux joueurs** puis enregistrer pour partager l’élément. Ses parents
+   doivent eux aussi être visibles. Les créations sont privées par défaut. Les modifications
+   d’éléments visibles sont immédiatement partagées à l’enregistrement.
+5. **Supprimer** demande de retaper le titre. Supprimer un Arc supprime aussi ses Sessions ;
+   supprimer une Fable supprime tous ses Arcs et Sessions. Les sauvegardes conservent le journal.
+
+Le premier démarrage de cette mise à jour ajoute **Fable I → Arc 1 → Session 1 / Session 2**,
+visibles et marquées jouées, sans dates ni descriptions inventées. **Arc 1** est un intitulé
+provisoire, librement modifiable. Ces données ne sont pas réimportées lors des redémarrages,
+même si vous les supprimez. Les comptes, archives et images existants sont conservés.
+
+Chaque niveau affiche au maximum **20 éléments par page** dans les deux interfaces.
+Les listes ne chargent que le début des récits. Le champ **Ordre d’affichage** fixe l’ordre
+au sein du parent ; les égalités sont départagées par titre puis identifiant. Une nouvelle fiche
+propose par défaut l’ordre suivant le dernier élément, même quand il est sur une autre page.
+Les modifications concurrentes d’une même fiche sont refusées plutôt que de l’écraser.
 
 ## Conservation du contenu
 
