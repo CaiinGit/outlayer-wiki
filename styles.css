@@ -823,6 +823,7 @@ h1 span {
 .main-nav { display: flex; flex: 1; min-width: 0; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0 clamp(12px, 1.5vw, 32px); }
 .main-nav a { position: relative; padding: 25px 0; color: #b9b3a6; font-size: .875rem; letter-spacing: .105em; text-transform: uppercase; white-space: nowrap; }
 .main-nav a:hover, .main-nav a[aria-current] { color: #f1dfb8; }
+.main-nav a[aria-disabled="true"] { color: #9f998c; cursor: default; }
 .main-nav a[aria-current]::before { content: ''; position: absolute; height: 1px; bottom: -1px; left: 0; right: 0; background: #d2ad68; }
 .main-nav a[aria-current]::after { content: ''; position: absolute; bottom: -4px; left: calc(50% - 3px); width: 7px; height: 7px; transform: rotate(45deg); background: #c49d5e; }
 .nav-actions { display: flex; flex-shrink: 0; align-items: center; gap: 20px; }
