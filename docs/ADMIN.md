@@ -55,7 +55,51 @@ Les mots de passe sont hachés ; les cookies de session sont HttpOnly et les mod
 exigent un jeton CSRF. Les inscriptions sont limitées à 5 par heure par adresse vue par l’API,
 et les connexions à 8 échecs par tranche de 15 minutes. Derrière le proxy actuel, ces limites
 peuvent être partagées par les visiteurs. Les comptes sont inclus dans les sauvegardes SQLite
-(schéma 4) ; les sauvegardes des schémas 1, 2 et 3 restent restaurables et sont migrées au démarrage.
+(schéma 5) ; les sauvegardes des schémas 1, 2, 3 et 4 restent restaurables et sont migrées au démarrage.
+
+## Chronologie du monde
+
+La page **Chronologie** (`/chronologie/`) affiche les ères et les événements révélés sous
+forme de frise verticale. Elle est réservée aux joueurs validés et au MJ. Les récits complets
+se lisent à l’ouverture ; les listes sont limitées à 20 repères par page, avec recherche et filtre.
+Le fond utilise des animations de déplacement et d’opacité, sans flou dynamique. Le bouton
+**Pause animation**, le réglage système de réduction des mouvements et l’onglet masqué
+arrêtent les animations. Les cartes restent lisibles lorsque les animations sont désactivées.
+
+### Reprendre la frise Notion
+
+La page Notion est un point de départ, pas une synchronisation continue. Les modifications
+se font ensuite dans **Atelier → Chronologie** (`/admin/timeline.html`).
+
+1. Enregistrer sur votre ordinateur le fichier JSON d’import fourni séparément.
+2. Ouvrir **Importer la frise préparée depuis Notion**, choisir ce fichier et contrôler la liste.
+3. Cliquer sur **Importer en privé**. Le serveur force tous les éléments importés à rester privés.
+4. Ouvrir **Modifier**, ajuster le récit ou la date, cocher **Révélé aux joueurs**, puis enregistrer.
+
+Le fichier Notion contient des informations de campagne privées : il n’est ni embarqué dans
+le code public ni servi comme fichier statique. Le dépôt ne crée aucun événement de chronologie
+au démarrage. Après import, les données sont stockées dans SQLite et incluses dans les sauvegardes.
+Une nouvelle importation ignore les références source déjà présentes et conserve vos modifications.
+Un élément supprimé peut être importé à nouveau si son fichier est réimporté.
+
+### Modifier les repères
+
+Un repère possède un titre, un type **Ère / Événement**, une description, un ordre de lecture et
+sa visibilité. Les années sont des entiers : les années négatives et l’année zéro sont acceptées.
+Une année de fin décrit une période. Sans année de début, la frise indique **Date non précisée**.
+Un libellé de date facultatif peut remplacer cet affichage pour conserver une formulation incertaine.
+L’ordre est éditable pour placer les ères non datées : la frise n’utilise pas une échelle de temps
+proportionnelle. En cas d’égalité d’ordre, l’identifiant départage les événements.
+
+Les nouveaux événements sont privés par défaut. Enregistrer un événement déjà révélé modifie
+immédiatement ce que voient les joueurs. Décocher la visibilité le retire de leurs listes et de
+leur accès direct. La suppression exige de retaper le titre ; les modifications concurrentes sont
+refusées si la fiche a changé entre-temps.
+
+Le format d’import JSON est `{ "version": 1, "events": [...] }`, avec 1 à 200 événements,
+chacun ayant une `source_key` unique, un `title`, `kind` (`era` ou `event`), `description`,
+`start_year` / `end_year` (entiers ou `null`), `date_label` et `position` (entier positif).
+Le formulaire accepte des fichiers de 2 Mo maximum et présente les titres avant import.
 
 ## Journal des sessions
 

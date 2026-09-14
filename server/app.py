@@ -16,6 +16,7 @@ from .browse import index_entry, page, related
 from .teasers import make_teaser
 from .accounts import current_session, register_accounts
 from .journal import register_journal
+from .timeline import register_timeline
 
 Image.MAX_IMAGE_PIXELS = 20_000_000
 
@@ -65,7 +66,7 @@ def create_app(config=None):
     @app.before_request
     def protect_codex():
         path = request.path
-        if path in ('/api/catalog', '/data/codex.json', '/api/journal') or path.startswith(('/api/entries/', '/api/images/', '/api/teasers/', '/assets/codex/', '/api/journal/')):
+        if path in ('/api/catalog', '/data/codex.json', '/api/journal', '/api/timeline') or path.startswith(('/api/entries/', '/api/images/', '/api/teasers/', '/assets/codex/', '/api/journal/', '/api/timeline/')):
             auth = session()
             if not auth:
                 abort(401, description='Connectez-vous pour consulter la campagne.')
@@ -182,6 +183,7 @@ def create_app(config=None):
 
     register_accounts(app, db, private, payload)
     register_journal(app, db, private, payload)
+    register_timeline(app, db, private, payload)
 
     @app.get('/api/admin/session')
     @private
@@ -331,8 +333,14 @@ def create_app(config=None):
     def sessions_page():
         return send_from_directory(ROOT / 'journal', 'index.html')
 
+    @app.get('/chronologie/')
+    def chronology_page():
+        return send_from_directory(ROOT / 'timeline','index.html')
+
     @app.get('/<path:name>')
     def static_file(name):
+        if name in ('timeline/timeline.css','timeline/public.js','timeline/common.js','admin/timeline.html','admin/timeline.js'):
+            return send_from_directory(ROOT,name)
         if name in ('journal/journal.css','journal/public.js','admin/journal.html','admin/journal.js'):
             return send_from_directory(ROOT,name)
         if name in ('styles.css', 'app.js', 'catalog.js', 'entry-view.js', 'admin/admin.js', 'admin/admin.css', 'admin/account.html', 'admin/account.js', 'admin/users.html', 'admin/users.js') or (name.startswith('assets/') and '..' not in Path(name).parts):

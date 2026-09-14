@@ -1,0 +1,29 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Chronologie — Outlayer</title><link rel="stylesheet" href="/styles.css?v=timeline-1"><link rel="stylesheet" href="/journal/journal.css?v=journal-1"><link rel="stylesheet" href="/timeline/timeline.css?v=timeline-1"><script src="/timeline/common.js?v=timeline-1" defer></script><script src="/timeline/public.js?v=timeline-1" defer></script></head><body class="chronology-page"><a class="skip-link" href="#chronologyContent">Aller à la frise</a><div class="timeline-space" aria-hidden="true"><span></span></div>  <header class="topbar">
+    <a href="/" class="brand" aria-label="Outlayer — Accueil">
+      <img src="/assets/outlayer-logo-original.png" width="1024" height="397" alt="Outlayer">
+    </a>
+
+    <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
+      <a href="/" data-section="accueil">Accueil</a>
+      <a href="/sessions/" data-section="sessions">Sessions</a>
+      <a href="/chronologie/" data-section="chronologie" aria-current="page">Chronologie</a>
+      <a role="link" aria-disabled="true" aria-label="Compétences — à venir" title="À venir">Compétences</a>
+      <a role="link" aria-disabled="true" aria-label="Maîtrises — à venir" title="À venir">Maîtrises</a>
+      <a role="link" aria-disabled="true" aria-label="Coffre — à venir" title="À venir">Coffre</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="nav-search" href="/#searchInput" aria-label="Rechercher dans le codex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg>
+      </a>
+      <a class="account-link" href="/account/">Connexion</a>
+      <a class="nav-codex" href="/#codex" data-category="Tous"><span aria-hidden="true">✧</span> Codex</a>
+    </div>
+  </header>
+<main><section id="chronologyHero" class="chronology-hero" hidden><div class="chronology-orbit" aria-hidden="true"></div><p class="kicker">LA MÉMOIRE DU MONDE</p><h1>Avant vos pas,<br><em>les traces du temps.</em></h1><p>Des origines oubliées aux événements qui ont façonné le monde. Remontez le fil des histoires révélées.</p><a id="editTimeline" class="timeline-link" href="/admin/timeline.html" hidden>Façonner la chronologie · Atelier du MJ ↗</a></section>
+<section id="accessGate" class="section" hidden><div class="timeline-empty"><h1>Les archives du temps.</h1><p>Connectez-vous avec un compte joueur validé pour explorer la chronologie.</p><a href="/account/">Se connecter →</a></div></section><p id="timelineNotice" class="timeline-summary" role="status" aria-live="polite"></p>
+<section id="chronologyContent" hidden><div class="timeline-controls"><label class="timeline-search">Rechercher<input id="timelineSearch" type="search" maxlength="200" placeholder="Un événement, une époque…"></label><label>Afficher<select id="timelineKind"><option value="all">Tout le récit</option><option value="era">Les ères</option><option value="event">Les événements</option></select></label><button id="pauseMotion" aria-pressed="false">Pause animation</button><button id="retryTimeline">Actualiser</button></div><div class="timeline-shell"><p id="timelineCount" class="timeline-summary"></p><div id="timelineList" class="timeline-list"></div><p id="timelineEmpty" class="timeline-empty" hidden></p><nav id="timelinePager" class="timeline-pagination" aria-label="Pages de la chronologie" hidden><button id="prevPage">← Précédente</button><span id="pageInfo"></span><button id="nextPage">Suivante →</button></nav></div></section></main>
+<footer class="footer"><span>OUTLAYER — La mémoire du monde</span><a href="/#codex">Retour au codex</a></footer><dialog id="eventDialog" class="journal-dialog" aria-labelledby="eventTitle"><button id="closeEvent">Fermer ×</button><p class="kicker">LES ARCHIVES DU TEMPS</p><h2 id="eventTitle"></h2><p id="eventDate" class="journal-caption"></p><div id="eventText" class="journal-description"></div></dialog></body></html>

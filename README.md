@@ -25,6 +25,9 @@ les fichiers montés par Nginx et conserve les volumes de données.
 
 ## Fonctions
 
+- Chronologie sur `/chronologie/` : frise verticale animée, recherche, ères et événements.
+- Atelier Chronologie : dates négatives ou inconnues, récits, ordre, import JSON privé et révélation aux joueurs.
+
 - Journal de campagne sur `/sessions/` : Fables → Arcs → Sessions, récits et dates.
 - Gestion depuis **Atelier → Sessions** : création, modification, ordre, visibilité et suppression.
 - Fable **I**, **Arc 1** (renommable), **Session 1** et **Session 2** initialisés une seule fois, sans récit inventé.
