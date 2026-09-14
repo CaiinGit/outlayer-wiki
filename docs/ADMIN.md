@@ -81,6 +81,10 @@ La suppression d’une compétence enlève ses liens ; celle d’une Affinité e
 Une modification concurrente est signalée au lieu d’écraser silencieusement un arbre.
 
 La page `/competences/` est réservée aux joueurs validés et au MJ. Elle charge un arbre
+en plein écran sous la navigation. Les fiches apparaissent au survol, au focus clavier
+ou au toucher sur mobile ; Échap ou la croix les ferme. Le choix d’Affinité et les
+options de zoom/simulation sont repliables. L’illustration couvre le fond sans répétition.
+Les compétences passives sont rondes, les actives carrées. Elle charge un arbre
 à la fois, avec 20 Affinités par page et un maximum de 200 compétences et 600 liens par
 arbre. Déplacements et zoom utilisent des transformations ; pendant un déplacement,
 seuls le nœud et ses liens sont mis à jour, au rythme du navigateur.
