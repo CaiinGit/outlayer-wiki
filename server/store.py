@@ -8,6 +8,7 @@ from .teasers import make_teaser
 from .accounts import migrate_accounts
 from .journal import migrate_journal
 from .timeline import migrate_timeline
+from .skills import migrate_skills
 
 TYPES = ['Lieux', 'Personnages', 'Factions', 'Bestiaire', 'Artefacts', 'Utilitaires', 'Divinités']
 SEALED = 'assets/codex/sealed.svg'
@@ -39,7 +40,7 @@ def initialize(path):
         db.execute('PRAGMA journal_mode=WAL')
         db.execute('BEGIN IMMEDIATE')
         version = db.execute('PRAGMA user_version').fetchone()[0]
-        if version not in (0, 1, 2, 3, 4, 5):
+        if version not in (0, 1, 2, 3, 4, 5, 6):
             raise RuntimeError('Version de base non prise en charge')
         db.execute('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS entries (id TEXT PRIMARY KEY, draft TEXT NOT NULL, published TEXT, revision INTEGER NOT NULL DEFAULT 1, revealed_at TEXT, updated_at TEXT NOT NULL)')
@@ -67,7 +68,8 @@ def initialize(path):
         migrate_accounts(db)
         migrate_journal(db)
         migrate_timeline(db)
-        db.execute('PRAGMA user_version=5')
+        migrate_skills(db)
+        db.execute('PRAGMA user_version=6')
     if os.name != 'nt':
         os.chmod(path, 0o600)
 

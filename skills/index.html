@@ -1,0 +1,35 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Compétences — Outlayer</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/skills/skills.css"><script src="/skills/graph.js" defer></script><script src="/skills/public.js" defer></script></head><body class="skills-page"><a class="skip-link" href="#skillsContent">Aller aux compétences</a>  <header class="topbar">
+    <a href="/" class="brand" aria-label="Outlayer — Accueil">
+      <img src="/assets/outlayer-logo-original.png" width="1024" height="397" alt="Outlayer">
+    </a>
+
+    <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mainNav">
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="main-nav" id="mainNav" aria-label="Navigation principale">
+      <a href="/" data-section="accueil">Accueil</a>
+      <a href="/sessions/" data-section="sessions">Sessions</a>
+      <a href="/chronologie/" data-section="chronologie">Chronologie</a>
+      <a href="/competences/" data-section="competences" aria-current="page">Compétences</a>
+      <a role="link" aria-disabled="true" aria-label="Maîtrises — à venir" title="À venir">Maîtrises</a>
+      <a role="link" aria-disabled="true" aria-label="Coffre — à venir" title="À venir">Coffre</a>
+    </nav>
+    <div class="nav-actions">
+      <a class="nav-search" href="/#searchInput" aria-label="Rechercher dans le codex">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg>
+      </a>
+      <a class="account-link" href="/account/">Connexion</a>
+      <a class="nav-codex" href="/#codex" data-category="Tous"><span aria-hidden="true">✧</span> Codex</a>
+    </div>
+  </header>
+<main><section id="skillsHero" class="skills-hero" hidden><p class="kicker">LES VOIES DE L’AFFINITÉ</p><h1>Un pouvoir. <em>Mille possibles.</em></h1><p>Choisissez votre Affinité. Explorez ses compétences et tracez le chemin de votre progression.</p><a id="editSkills" class="account-link" href="/admin/skills.html" hidden>Façonner les arbres · Atelier du MJ ↗</a></section>
+<section id="accessGate" class="skills-layout" hidden><div class="skills-empty"><h1>Votre Affinité vous attend.</h1><p>Connectez-vous avec un compte joueur validé pour explorer les compétences.</p><a href="/account/">Se connecter →</a></div></section>
+<p id="skillsNotice" class="skill-notice" role="status" aria-live="polite"></p>
+<div id="skillsContent" class="skills-layout" hidden><nav id="affinityList" class="affinity-bar" aria-label="Choisir une Affinité"></nav><nav id="affinityPager" class="skills-pager" hidden><button id="prevAffinity" class="skills-button">← Précédente</button><span id="affinityPage"></span><button id="nextAffinity" class="skills-button">Suivante →</button></nav>
+<div id="affinityEmpty" class="skills-empty" hidden><h2>Les voies restent à découvrir.</h2><p>Le MJ n’a pas encore publié d’Affinité.</p></div>
+<div id="talentLayout" class="talent-layout" hidden><section class="talent-canvas-wrap"><header class="tree-heading"><div><p class="skill-eyebrow">ARBRE DE COMPÉTENCES</p><h2 id="treeName"></h2><p id="treeCount"></p></div><span aria-hidden="true">✧</span></header><p id="affinityDescription" class="affinity-description"></p>
+<div class="tree-toolbar"><button id="zoomOut" aria-label="Dézoomer">−</button><span id="zoomValue">100 %</span><button id="zoomIn" aria-label="Zoomer">＋</button><button id="fitTree">Centrer l’arbre</button><button id="viewDetails">Détails de la compétence ↓</button></div>
+<p id="treeEmpty" class="skills-empty" hidden>Les premières compétences seront bientôt inscrites ici.</p><div id="treeBoard" class="skill-board" role="region" aria-label="Arbre interactif : faites glisser le fond pour explorer"></div><div class="tree-legend"><span>▢ Active</span><span>○ Passive</span><span>◇ Ultime</span><span>Flèches : prérequis → compétence</span></div>
+<div class="simulation-controls"><label><input id="simulate" type="checkbox"> Simuler mon parcours</label><strong id="simulationTotal"></strong><button id="resetBuild" class="skills-button">Réinitialiser</button><p class="simulation-note">Une simulation libre pour préparer vos choix. Aucun personnage n’est modifié ; le parcours est effacé en quittant cet arbre.</p></div></section>
+<aside id="skillInspector" class="skill-inspector"><div id="chooseSkill"><p class="skill-eyebrow">VOTRE PROCHAIN CHOIX</p><h2>Chaque pouvoir ouvre une voie.</h2><p>Sélectionnez une compétence pour découvrir son fonctionnement, ses coûts et les conditions pour l’obtenir.</p><p>Déplacez le fond pour parcourir l’arbre. Utilisez les boutons de zoom ou Ctrl + molette pour vous rapprocher.</p></div><div id="skillDetail" hidden><p id="skillType" class="skill-eyebrow"></p><h2 id="skillName"></h2><p id="skillDescription"></p><h3>Obtention</h3><p id="skillAcquisition"></p><h3>Utilisation</h3><p id="skillUsage"></p><h3>Coût d’utilisation</h3><p id="skillCost"></p><h3>Temps de recharge</h3><p id="skillCooldown"></p><h3>Portée</h3><p id="skillRange"></p><h3>Prérequis</h3><p id="requirementMode"></p><ul id="skillPrerequisites" class="prerequisite-list"></ul><button id="learnSkill" class="skills-button" hidden></button></div></aside></div></div></main><footer class="footer"><span>OUTLAYER — Les Affinités</span><a href="/#codex">Retour au codex</a></footer></body></html>

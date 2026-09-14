@@ -19,6 +19,7 @@ services:
       - ./admin:/usr/share/nginx/html/admin:ro
       - ./journal:/usr/share/nginx/html/journal:ro
       - ./timeline:/usr/share/nginx/html/timeline:ro
+      - ./skills:/usr/share/nginx/html/skills:ro
   api:
     build: .
     restart: unless-stopped

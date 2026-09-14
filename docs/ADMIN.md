@@ -57,6 +57,40 @@ et les connexions à 8 échecs par tranche de 15 minutes. Derrière le proxy act
 peuvent être partagées par les visiteurs. Les comptes sont inclus dans les sauvegardes SQLite
 (schéma 5) ; les sauvegardes des schémas 1, 2, 3 et 4 restent restaurables et sont migrées au démarrage.
 
+## Affinités et arbres de compétences
+
+Ouvrez **Atelier → Compétences** (`/admin/skills.html`), puis **Nouvelle Affinité**.
+Le nom, la couleur, le symbole et l’illustration de fond personnalisent chaque arbre.
+Aucune classe ni compétence de démonstration n’est ajoutée à la campagne.
+
+Ajoutez les compétences, puis déplacez leurs icônes. Le bouton **Relier** permet de
+cliquer le prérequis puis la compétence qu’il débloque. Le formulaire propose aussi
+une liste de prérequis et des coordonnées : le clavier suffit donc pour organiser
+l’arbre. Les flèches du clavier déplacent l’icône ciblée. Les boucles sont refusées.
+Chaque compétence peut exiger tous ses prérequis ou au moins un d’entre eux.
+
+Renseignez description, obtention, utilisation, coût, recharge, portée et points de
+déblocage. Les formes distinguent les compétences actives, passives et ultimes.
+Vous pouvez importer des icônes ; elles sont converties en WebP de 128 pixels maximum.
+Le fond est redimensionné à 1600 × 1000 maximum. Les images privées sont protégées.
+
+**Enregistrer le brouillon** conserve les modifications sans changer la vue joueurs.
+**Publier pour les joueurs** remplace la version visible. **Retirer de la vue joueurs**
+masque l’Affinité en gardant son brouillon. Annuler/rétablir conserve 30 étapes locales.
+La suppression d’une compétence enlève ses liens ; celle d’une Affinité exige son nom.
+Une modification concurrente est signalée au lieu d’écraser silencieusement un arbre.
+
+La page `/competences/` est réservée aux joueurs validés et au MJ. Elle charge un arbre
+à la fois, avec 20 Affinités par page et un maximum de 200 compétences et 600 liens par
+arbre. Déplacements et zoom utilisent des transformations ; pendant un déplacement,
+seuls le nœud et ses liens sont mis à jour, au rythme du navigateur.
+
+Le simulateur vérifie les prérequis et compte les points. Retirer un prérequis retire
+aussi les choix devenus impossibles. Cette simulation est locale, sans budget imposé
+ni modification de personnage ; elle disparaît en changeant d’arbre ou en rechargeant.
+Les données réelles des arbres sont conservées dans SQLite et incluses aux sauvegardes.
+Le schéma passe à la version 6 ; les sauvegardes des versions 1 à 5 restent migrables.
+
 ## Chronologie du monde
 
 La page **Chronologie** (`/chronologie/`) affiche les ères et les événements révélés sous

@@ -26,6 +26,8 @@ les fichiers montés par Nginx et conserve les volumes de données.
 ## Fonctions
 
 - Chronologie sur `/chronologie/` : frise verticale animée, recherche, ères et événements.
+- Compétences sur `/competences/` : choix d’Affinité, arbres interactifs, fiches détaillées et simulation locale des prérequis.
+- Atelier Compétences : glisser-déposer, liens dirigés, règles « tous » ou « au moins un », icônes et fonds personnalisés, brouillons et publication indépendante.
 - Atelier Chronologie : dates négatives ou inconnues, récits, ordre, import JSON privé et révélation aux joueurs.
 
 - Journal de campagne sur `/sessions/` : Fables → Arcs → Sessions, récits et dates.

@@ -17,6 +17,7 @@ from .teasers import make_teaser
 from .accounts import current_session, register_accounts
 from .journal import register_journal
 from .timeline import register_timeline
+from .skills import register_skills
 
 Image.MAX_IMAGE_PIXELS = 20_000_000
 
@@ -66,7 +67,7 @@ def create_app(config=None):
     @app.before_request
     def protect_codex():
         path = request.path
-        if path in ('/api/catalog', '/data/codex.json', '/api/journal', '/api/timeline') or path.startswith(('/api/entries/', '/api/images/', '/api/teasers/', '/assets/codex/', '/api/journal/', '/api/timeline/')):
+        if path in ('/api/catalog', '/data/codex.json', '/api/journal', '/api/timeline', '/api/affinities') or path.startswith(('/api/entries/', '/api/images/', '/api/teasers/', '/assets/codex/', '/api/journal/', '/api/timeline/', '/api/affinities/')):
             auth = session()
             if not auth:
                 abort(401, description='Connectez-vous pour consulter la campagne.')
@@ -184,6 +185,7 @@ def create_app(config=None):
     register_accounts(app, db, private, payload)
     register_journal(app, db, private, payload)
     register_timeline(app, db, private, payload)
+    register_skills(app, db, private, payload)
 
     @app.get('/api/admin/session')
     @private
@@ -285,7 +287,7 @@ def create_app(config=None):
                     if original.format not in ('PNG', 'JPEG', 'WEBP'):
                         abort(400, description='Format accepté : PNG, JPEG ou WebP.')
                     image = ImageOps.exif_transpose(original).convert('RGBA')
-                    image.thumbnail((1600, 1000))
+                    image.thumbnail((128,128) if request.form.get('purpose')=='skill-icon' else (1600, 1000))
                     output = io.BytesIO()
                     image.save(output, 'WEBP', quality=85, method=4)
         except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError, Image.DecompressionBombWarning):
@@ -298,7 +300,7 @@ def create_app(config=None):
     @app.get('/api/images/<image_id>')
     def image(image_id):
         path = '/api/images/'+image_id
-        if session()['role'] != 'mj' and not db().execute("SELECT 1 FROM entries WHERE json_extract(published, '$.known')=1 AND json_extract(published, '$.image')=? LIMIT 1", (path,)).fetchone():
+        if session()['role'] != 'mj' and not db().execute("SELECT 1 FROM entries WHERE json_extract(published, '$.known')=1 AND json_extract(published, '$.image')=? LIMIT 1", (path,)).fetchone() and not db().execute("SELECT 1 FROM affinities WHERE published IS NOT NULL AND (json_extract(published,'$.image')=? OR EXISTS (SELECT 1 FROM json_each(json_extract(published,'$.nodes')) WHERE json_extract(value,'$.image')=?)) LIMIT 1", (path,path)).fetchone():
             abort(404)
         row = db().execute('SELECT body FROM images WHERE id=?', (image_id,)).fetchone()
         if not row:
@@ -337,8 +339,14 @@ def create_app(config=None):
     def chronology_page():
         return send_from_directory(ROOT / 'timeline','index.html')
 
+    @app.get('/competences/')
+    def skills_page():
+        return send_from_directory(ROOT / 'skills','index.html')
+
     @app.get('/<path:name>')
     def static_file(name):
+        if name in ('skills/graph.js','skills/skills.css','skills/public.js','admin/skills.html','admin/skills.js'):
+            return send_from_directory(ROOT,name)
         if name in ('timeline/timeline.css','timeline/public.js','timeline/common.js','admin/timeline.html','admin/timeline.js'):
             return send_from_directory(ROOT,name)
         if name in ('journal/journal.css','journal/public.js','admin/journal.html','admin/journal.js'):
