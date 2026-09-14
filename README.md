@@ -10,18 +10,24 @@ Dans la connexion SSH au serveur :
 ```bash
 cd /srv/docker/outlayer-wiki
 git pull
-docker compose up -d --build
-docker compose exec api python -m server.manage set-password
+docker compose up -d --build --force-recreate
 ```
 
-Choisir un mot de passe MJ d’au moins 12 caractères. Ouvrir ensuite
-`http://192.168.1.197:8081/admin/`. Aucun mot de passe n’est fourni par défaut.
-Le codex joueur garde son adresse habituelle.
+Le compte **mj** reprend automatiquement le mot de passe MJ existant. Les anciennes sessions
+sont fermées : reconnectez-vous sur `/account/`. Les archives restent intactes.
+Sur une installation neuve uniquement, créer le compte MJ avec
+`docker compose exec api python -m server.manage set-password` (12 caractères minimum).
+Cette commande permet aussi de récupérer un accès MJ oublié.
+Actualisez avec Ctrl + F5 après la mise à jour. La recréation des conteneurs renouvelle
+les fichiers montés par Nginx et conserve les volumes de données.
 
 **[Installation, utilisation et sauvegardes](docs/ADMIN.md)**
 
 ## Fonctions
 
+- Comptes MJ, joueur et invité ; inscription puis validation par le MJ.
+- Accueil ouvert, codex réservé aux joueurs validés et au MJ.
+- Gestion des comptes paginée, désactivation et réinitialisation des mots de passe.
 - Brouillons privés et notes MJ séparés des versions publiées.
 - Import d’images, conversion WebP et contrôle de leur accès.
 - Illustrations précalculées très floutées pour les archives scellées, sans transmettre l’original privé.

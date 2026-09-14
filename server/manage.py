@@ -3,6 +3,7 @@ import getpass
 import os
 import sqlite3
 import time
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -38,7 +39,7 @@ def restore(database, source, directory):
         raise ValueError('Choisir une sauvegarde dans le répertoire prévu')
     db = sqlite3.connect(f'file:{source.as_posix()}?mode=ro', uri=True)
     try:
-        if db.execute('PRAGMA integrity_check').fetchone()[0] != 'ok' or db.execute('PRAGMA user_version').fetchone()[0] not in (1, 2):
+        if db.execute('PRAGMA integrity_check').fetchone()[0] != 'ok' or db.execute('PRAGMA user_version').fetchone()[0] not in (1, 2, 3):
             raise ValueError('Sauvegarde invalide')
         for table in ['entries', 'settings', 'images', 'sessions']:
             db.execute(f'SELECT 1 FROM {table} LIMIT 1')
@@ -78,7 +79,7 @@ def main():
             raise SystemExit('Mot de passe trop court ou confirmation différente.')
         initialize(database)
         with connect(database) as db:
-            db.execute("INSERT INTO settings VALUES ('password', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (generate_password_hash(password),))
+            db.execute("INSERT INTO users VALUES (?, 'mj', ?, 'mj', 1) ON CONFLICT(username) DO UPDATE SET password=excluded.password,role='mj',active=1", (uuid.uuid4().hex, generate_password_hash(password)))
             db.execute('DELETE FROM sessions')
             db.execute('DELETE FROM attempts')
         print('Mot de passe enregistré. Les anciennes sessions sont fermées.')

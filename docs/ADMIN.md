@@ -10,18 +10,54 @@ Dans la connexion SSH au serveur :
 ```bash
 cd /srv/docker/outlayer-wiki
 git pull
-docker compose up -d --build
+docker compose up -d --build --force-recreate
+```
+
+Le compte **mj** reprend le mot de passe MJ existant. Il suffit de se reconnecter :
+la migration ferme les anciennes sessions, sans modifier les archives ni les images.
+Ouvrir `/account/` (ou `/admin/`) et saisir l’identifiant **mj** avec ce mot de passe.
+Actualiser avec Ctrl + F5 après le déploiement.
+
+Sur une installation neuve, ou pour récupérer le compte MJ :
+
+```bash
 docker compose exec api python -m server.manage set-password
 ```
 
-La dernière commande demande votre nouveau mot de passe MJ et sa confirmation.
-Utiliser au moins 12 caractères. Rien ne s’affiche pendant la saisie. Il n’existe
-aucun compte par défaut, aucun mot de passe partagé dans GitHub et aucune inscription
-publique. Cette commande permet également de changer un mot de passe oublié ; elle
-ferme toutes les anciennes sessions.
+Cette commande crée ou réactive **mj** avec les droits MJ. Elle demande un mot de passe
+de 12 caractères minimum et sa confirmation, puis ferme toutes les sessions.
+Aucun mot de passe n’est fourni par défaut ou enregistré dans GitHub.
 
-Ouvrir ensuite `http://192.168.1.197:8081/admin/` et saisir ce mot de passe.
-Le codex joueur conserve l’adresse habituelle. Actualiser avec Ctrl + F5.
+## Comptes et accès
+
+| Profil | Accès |
+| --- | --- |
+| Visiteur sans compte | Accueil et inscription |
+| Invité connecté | Accueil et gestion de son mot de passe |
+| Joueur validé | Codex, fiches révélées et aperçus floutés des archives scellées |
+| MJ | Codex, atelier, brouillons, images privées et gestion des comptes |
+
+1. Le joueur ouvre **Connexion → Créer mon compte**. Son compte reçoit toujours le rôle
+   **Invité**, même si une requête tente d’imposer un autre rôle.
+2. Le MJ ouvre **Atelier → Comptes**, recherche l’identifiant et sélectionne **Joueur**,
+   puis **Enregistrer**. La liste affiche 20 comptes par page.
+3. Le joueur se reconnecte pour entrer dans le codex. Les changements de rôle, désactivations
+   et réinitialisations de mot de passe ferment les sessions du compte concerné.
+
+Le MJ peut créer des comptes, changer leur rôle, désactiver leur accès ou définir un nouveau
+mot de passe. Attribuer le rôle MJ donne tous les droits ; l’interface demande confirmation.
+Le dernier compte MJ actif ne peut pas être désactivé ou rétrogradé. Chaque utilisateur peut
+changer son mot de passe depuis **Mon compte**, en fournissant son mot de passe actuel.
+Les comptes ne sont pas supprimés : désactiver un compte conserve la possibilité de le réactiver.
+
+Les rôles sont vérifiés par l’API sur chaque requête, y compris les images du codex.
+Les mots de passe sont hachés ; les cookies de session sont HttpOnly et les modifications
+exigent un jeton CSRF. Les inscriptions sont limitées à 5 par heure par adresse vue par l’API,
+et les connexions à 8 échecs par tranche de 15 minutes. Derrière le proxy actuel, ces limites
+peuvent être partagées par les visiteurs. Les comptes sont inclus dans les sauvegardes SQLite
+(schéma 3) ; les sauvegardes des schémas 1 et 2 restent restaurables et sont migrées au démarrage.
+
+## Conservation du contenu
 
 Le premier démarrage importe les sept archives de `data/codex.json`, avec seulement
 Le Noyau révélé. Les démarrages suivants utilisent exclusivement la base existante :
@@ -169,7 +205,7 @@ utiliser `set-password`. Toujours arrêter les deux services avant cette opérat
 ```bash
 cd /srv/docker/outlayer-wiki
 git pull
-docker compose up -d --build
+docker compose up -d --build --force-recreate
 ```
 
 ## Vérification pour le développement

@@ -4,17 +4,17 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Atelier du MJ — Outlayer</title>
-  <link rel="stylesheet" href="/admin/admin.css?v=teasers-1">
-  <script src="/admin/admin.js?v=teasers-1" defer></script>
+  <link rel="stylesheet" href="/admin/admin.css?v=accounts-1">
+  <script src="/admin/admin.js?v=accounts-1" defer></script>
 </head>
 <body>
-  <header><a class="brand" href="/"><img src="/assets/outlayer-logo-original.png" width="1024" height="397" alt="Outlayer"></a><span>ATELIER DU MJ</span><a href="/" target="_blank" rel="noopener">Voir le codex ↗</a><button id="logout" hidden>Se déconnecter</button></header>
+  <header><a class="brand" href="/"><img src="/assets/outlayer-logo-original.png" width="1024" height="397" alt="Outlayer"></a><span>ATELIER DU MJ</span><a href="/admin/users.html">Comptes</a><a href="/account/">Mon compte</a><a href="/" target="_blank" rel="noopener">Voir le codex ↗</a><button id="logout" hidden>Se déconnecter</button></header>
   <main>
     <p id="notice" role="status" aria-live="polite"></p>
     <section id="loginPanel" class="login-panel" hidden>
       <p class="eyebrow">DERRIÈRE LE VOILE</p><h1>Les archives du maître de jeu.</h1>
       <p>Préparez vos secrets. Révélez chaque découverte au bon moment.</p>
-      <form id="loginForm"><label>Mot de passe MJ<input id="password" type="password" autocomplete="current-password" required maxlength="1024"></label><button class="primary" type="submit">Entrer dans l’atelier</button></form>
+      <form id="loginForm"><label>Identifiant<input id="username" autocomplete="username" value="mj" maxlength="40" required></label><label>Mot de passe MJ<input id="password" type="password" autocomplete="current-password" required maxlength="1024"></label><button class="primary" type="submit">Entrer dans l’atelier</button></form>
     </section>
     <section id="workspace" hidden>
       <div class="intro"><div><p class="eyebrow">VOTRE CAMPAGNE</p><h1>Préparer. Relier. Révéler.</h1><p>Vos brouillons restent privés jusqu’à leur publication.</p></div><button id="create" class="primary">＋ Nouvelle archive</button></div>

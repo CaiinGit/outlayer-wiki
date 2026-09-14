@@ -8,9 +8,9 @@
   <title>Outlayer — Codex des joueurs</title>
   <link rel="preload" as="image" href="assets/outlayer-landscape-soft.webp" media="(min-width: 721px)">
   <link rel="preload" as="image" href="assets/outlayer-landscape-mobile-soft.webp" media="(max-width: 720px)">
-  <link rel="stylesheet" href="styles.css?v=teasers-1">
+  <link rel="stylesheet" href="styles.css?v=accounts-1">
 </head>
-<body>
+<body class="access-locked">
   <a class="skip-link" href="#codex">Aller au codex</a>
   <header class="topbar">
     <a href="#top" class="brand" aria-label="Outlayer — Accueil">
@@ -34,6 +34,7 @@
       <a class="nav-search" href="#searchInput" aria-label="Rechercher dans le codex">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg>
       </a>
+      <a class="account-link" href="/account/">Connexion</a>
       <a class="nav-codex" href="#codex" data-category="Tous"><span aria-hidden="true">✧</span> Codex</a>
     </div>
   </header>
@@ -57,6 +58,7 @@
         <p class="hero-motto hero-motto-right">Le monde appartient<br>à ceux qui le découvrent</p>
       </div>
     </section>
+    <section id="accessGate" class="section"><div class="about-panel"><div><p class="kicker">REJOINDRE L’AVENTURE</p><h2>Le monde attend ses explorateurs.</h2><p id="accessMessage">Connectez-vous ou créez votre compte. Le MJ vous ouvrira ensuite les portes du codex.</p><a class="nav-codex" href="/account/">Connexion / Inscription →</a></div></div></section>
 
     <section class="section intro-section">
       <div class="section-heading reveal">
@@ -193,7 +195,7 @@
 
   <footer class="footer">
     <span>OUTLAYER — Codex des joueurs</span>
-    <nav class="footer-nav" aria-label="Informations du codex"><a href="#progression">Progression</a><a href="#apropos">À propos</a><a href="/admin/">Espace MJ</a></nav>
+    <nav class="footer-nav" aria-label="Informations du codex"><a href="#progression">Progression</a><a href="#apropos">À propos</a><a href="/account/">Mon compte</a><a class="mj-only" href="/admin/" hidden>Atelier MJ</a></nav>
     <span>Univers de Valentin Brizard · <span id="year"></span></span>
   </footer>
 
@@ -202,8 +204,8 @@
     <div id="dialogContent"></div>
   </dialog>
 
-  <script src="catalog.js?v=teasers-1" defer></script>
-  <script src="entry-view.js?v=teasers-1" defer></script>
-  <script src="app.js?v=teasers-1" defer></script>
+  <script src="catalog.js?v=accounts-1" defer></script>
+  <script src="entry-view.js?v=accounts-1" defer></script>
+  <script src="app.js?v=accounts-1" defer></script>
 </body>
 </html>

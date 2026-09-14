@@ -1,4 +1,10 @@
 :root { color-scheme: dark; --gold: #d4b474; --muted: #ada58f; --line: #383326; }
+details { margin: 24px 0; }
+summary { cursor: pointer; color: var(--gold); }
+.users-list { display: grid; gap: 18px; }
+.user-row { display: grid; grid-template-columns: minmax(100px,1fr) repeat(2,minmax(100px,150px)) minmax(170px,1.5fr) auto; gap: 18px; align-items: center; padding: 20px; border: 1px solid var(--line); border-radius: 8px; }
+.user-row h2 { font-size: 23px; }
+@media(max-width:800px) { .user-row { grid-template-columns: 1fr; gap: 4px; } header { flex-wrap: wrap; } }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 body { margin: 0; background: #0d0e0e; color: #f1ead9; font: 16px/1.6 system-ui, sans-serif; }

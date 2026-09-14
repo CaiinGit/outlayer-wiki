@@ -338,7 +338,22 @@ statusSelect.value = ["all","known","locked"].includes(initialParams.get("state"
 document.getElementById("sortSelect").value = ["recent","name","oldest"].includes(initialParams.get("sort")) ? initialParams.get("sort") : "recent";
 pageNumber = Math.max(1, Number.parseInt(initialParams.get("page"),10) || 1);
 buildCategoryFilters();
-loadCatalog();
+async function checkAccess() {
+  try {
+    const response = await fetch('/api/session', {cache:'no-store'});
+    if(!response.ok) throw Error('Session indisponible');
+    const {user} = await response.json();
+    const allowed = user && ['mj','player'].includes(user.role);
+    document.body.classList.toggle('access-locked', !allowed);
+    document.getElementById('accessGate').hidden=!!allowed;
+    document.querySelector('.account-link').textContent=user ? 'Mon compte' : 'Connexion';
+    document.querySelectorAll('.mj-only').forEach(link=>link.hidden=user?.role!=='mj');
+    const cta=document.querySelector('.parallax-cta');
+    if(allowed) { cta.href='#codex'; await loadCatalog(); }
+    else { cta.href='/account/'; cta.removeAttribute('data-category'); cta.textContent='Rejoindre l’aventure'; if(user)document.getElementById('accessMessage').textContent='Votre compte invité attend la validation du MJ. Retrouvez votre statut dans Mon compte.'; }
+  } catch(error) {document.getElementById('accessMessage').textContent='Le serveur est indisponible. Rechargez la page pour réessayer.';}
+}
+checkAccess();
 function setupNavigationTracking() {
   const observer = new IntersectionObserver((records) => {
     records.forEach((record) => {

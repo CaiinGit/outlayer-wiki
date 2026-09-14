@@ -977,3 +977,11 @@ h1 span {
 #codexGrid { scroll-margin-top:calc(var(--header-size, 80px) + 20px); }
 #codexGrid[aria-busy="true"] { opacity:.55; pointer-events:none; }
 @media(max-width:480px) { .catalog-pagination { gap:10px; } .catalog-pagination button { padding:10px; } }
+
+/* Keep campaign sections hidden until the server has confirmed the account role. */
+[hidden] { display: none !important; }
+.access-locked main > section:not(#accueil):not(#accessGate),
+.access-locked .main-nav a:not([data-section="accueil"]),
+.access-locked .nav-search, .access-locked .nav-actions > .nav-codex,
+.access-locked .footer-nav a[href^="#"] { display: none; }
+.account-link { color: var(--gold, #d4b474); white-space: nowrap; font-size: 13px; }

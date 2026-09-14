@@ -144,7 +144,7 @@ async function enter() {
   await refresh(); $('loginPanel').hidden=true; $('workspace').hidden=false; $('logout').hidden=false;
   notify('Bienvenue dans l’atelier.');
 }
-$('loginForm').addEventListener('submit',event=>{event.preventDefault();run(async()=>{await api('/api/login','POST',{password:$('password').value});$('password').value='';await enter();});});
+$('loginForm').addEventListener('submit',event=>{event.preventDefault();run(async()=>{await api('/api/login','POST',{username:$('username').value,password:$('password').value});$('password').value='';await enter();});});
 $('logout').addEventListener('click',()=>{if(canLeave())run(async()=>{await api('/api/admin/logout','POST',{});dirty=false;location.reload();});});
 $('create').addEventListener('click',()=>{if(canLeave()) {edit(null);form.elements.namedItem('name').focus();}});
 $('search').addEventListener('input',()=>{

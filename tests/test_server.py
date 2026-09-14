@@ -23,6 +23,9 @@ class ServerTests(unittest.TestCase):
         self.player = self.app.test_client()
         response = self.mj.post('/api/login', json={'password': 'test-password-only'}, headers={'Origin': 'http://localhost'})
         self.csrf = response.json['csrf']
+        with connect(self.path) as db:
+            db.execute("INSERT INTO users VALUES ('player-test','player',?,'player',1)", (generate_password_hash('player-password-only'),))
+        self.player.post('/api/login', json={'username':'player','password':'player-password-only'}, headers={'Origin':'http://localhost'})
 
     def tearDown(self):
         self.temp.cleanup()
@@ -62,7 +65,7 @@ class ServerTests(unittest.TestCase):
         preview = self.mj.get('/api/admin/preview/'+row['id'])
         self.assertIn('Identité secrète', preview.get_data(as_text=True))
         self.assertNotIn('Notes uniquement MJ', preview.get_data(as_text=True))
-        self.assertEqual(self.player.get('/api/admin/preview/'+row['id']).status_code,401)
+        self.assertEqual(self.player.get('/api/admin/preview/'+row['id']).status_code,403)
         row = self.action(row, 'seal')
         public = json.dumps(self.catalog(), ensure_ascii=False)
         for secret in ['Identité secrète','Histoire secrète','Titre secret','Indice secret','Détail secret','Notes uniquement MJ']:
@@ -96,7 +99,7 @@ class ServerTests(unittest.TestCase):
         self.assertNotIn(second['id'], self.player.get('/api/entries/'+first['id']).json['entry']['relations'])
 
     def test_auth_origin_csrf_logout_and_rate_limit(self):
-        self.assertEqual(self.player.get('/api/admin/entries').status_code,401)
+        self.assertEqual(self.player.get('/api/admin/entries').status_code,403)
         self.assertEqual(self.mj.post('/api/admin/entries',json=self.draft(),headers={'Origin':'http://localhost'}).status_code,403)
         self.assertEqual(self.mj.post('/api/admin/entries',json=self.draft(),headers={'Origin':'https://attacker.invalid','X-CSRF-Token':self.csrf}).status_code,403)
         self.assertEqual(self.change('/api/admin/logout',{}).status_code,200)
@@ -175,7 +178,7 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(self.mj.get('/api/admin/entries').status_code, 401)
         with connect(self.path) as db:
             db.execute("DELETE FROM settings WHERE key='password'")
-        self.assertEqual(self.mj.post('/api/login',json={'password':'anything'},headers={'Origin':'http://localhost'}).status_code,503)
+        self.assertEqual(self.mj.post('/api/login',json={'password':'anything'},headers={'Origin':'http://localhost'}).status_code,401)
 
     def test_teaser_removes_details_and_migration_does_not_publish_later_drafts(self):
         from PIL import ImageStat

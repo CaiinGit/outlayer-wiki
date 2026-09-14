@@ -1,10 +1,8 @@
-import hashlib
 import io
 import json
 import os
 import re
 import secrets
-import time
 import uuid
 import warnings
 from functools import wraps
@@ -12,11 +10,11 @@ from pathlib import Path
 
 from flask import Flask, abort, g, jsonify, request, send_file, send_from_directory
 from PIL import Image, ImageOps, UnidentifiedImageError
-from werkzeug.security import check_password_hash
 
 from .store import ROOT, TYPES, connect, initialize, now, public_item
 from .browse import index_entry, page, related
 from .teasers import make_teaser
+from .accounts import current_session, register_accounts
 
 Image.MAX_IMAGE_PIXELS = 20_000_000
 
@@ -43,8 +41,7 @@ def create_app(config=None):
             g.db.close()
 
     def session():
-        token = request.cookies.get('outlayer_mj', '')
-        return db().execute('SELECT * FROM sessions WHERE token=? AND expires>?', (hashlib.sha256(token.encode()).hexdigest(), time.time())).fetchone() if token else None
+        return current_session(db())
 
     def private(fn):
         @wraps(fn)
@@ -52,6 +49,8 @@ def create_app(config=None):
             g.auth = session()
             if not g.auth:
                 abort(401, description='Connexion MJ requise.')
+            if g.auth['role'] != 'mj':
+                abort(403, description='Cet espace est réservé au MJ.')
             if request.method not in ('GET', 'HEAD') and not secrets.compare_digest(request.headers.get('X-CSRF-Token', ''), g.auth['csrf']):
                 abort(403, description='Session expirée. Reconnectez-vous.')
             return fn(*args, **kwargs)
@@ -61,6 +60,16 @@ def create_app(config=None):
     def protect_origin():
         if request.method not in ('GET', 'HEAD', 'OPTIONS') and request.headers.get('Origin') != app.config['ORIGIN']:
             abort(403, description='Origine de la requête refusée.')
+
+    @app.before_request
+    def protect_codex():
+        path = request.path
+        if path in ('/api/catalog', '/data/codex.json') or path.startswith(('/api/entries/', '/api/images/', '/api/teasers/', '/assets/codex/')):
+            auth = session()
+            if not auth:
+                abort(401, description='Connectez-vous pour consulter le codex.')
+            if auth['role'] not in ('mj', 'player'):
+                abort(403, description='Votre compte invité attend la validation du MJ.')
 
     @app.after_request
     def headers(response):
@@ -170,36 +179,7 @@ def create_app(config=None):
             abort(404)
         return detail(row)
 
-    @app.post('/api/login')
-    def login():
-        password = payload().get('password', '')
-        if not isinstance(password, str) or len(password) > 1024:
-            abort(400)
-        connection = db()
-        connection.execute('BEGIN IMMEDIATE')
-        key = request.remote_addr or 'local'
-        stamp = time.time()
-        connection.execute('DELETE FROM attempts WHERE expires<?', (stamp,))
-        attempt = connection.execute('SELECT * FROM attempts WHERE address=?', (key,)).fetchone()
-        if attempt and attempt['count'] >= 8:
-            connection.commit()
-            abort(429, description='Trop de tentatives. Réessayez dans 15 minutes.')
-        setting = connection.execute("SELECT value FROM settings WHERE key='password'").fetchone()
-        if not setting:
-            connection.commit()
-            abort(503, description='Le compte MJ doit être configuré depuis le serveur. Consultez le guide d’installation.')
-        if not check_password_hash(setting['value'], password):
-            connection.execute('INSERT INTO attempts VALUES (?, 1, ?) ON CONFLICT(address) DO UPDATE SET count=count+1', (key, stamp+900))
-            connection.commit()
-            abort(401, description='Mot de passe incorrect.')
-        connection.execute('DELETE FROM attempts WHERE address=?', (key,))
-        connection.execute('DELETE FROM sessions WHERE expires<?', (stamp,))
-        raw, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
-        connection.execute('INSERT INTO sessions VALUES (?, ?, ?)', (hashlib.sha256(raw.encode()).hexdigest(), csrf, stamp+8*3600))
-        connection.commit()
-        response = jsonify(csrf=csrf)
-        response.set_cookie('outlayer_mj', raw, max_age=8*3600, httponly=True, secure=app.config['COOKIE_SECURE'], samesite='Strict')
-        return response
+    register_accounts(app, db, private, payload)
 
     @app.get('/api/admin/session')
     @private
@@ -314,7 +294,7 @@ def create_app(config=None):
     @app.get('/api/images/<image_id>')
     def image(image_id):
         path = '/api/images/'+image_id
-        if not session() and not db().execute("SELECT 1 FROM entries WHERE json_extract(published, '$.known')=1 AND json_extract(published, '$.image')=? LIMIT 1", (path,)).fetchone():
+        if session()['role'] != 'mj' and not db().execute("SELECT 1 FROM entries WHERE json_extract(published, '$.known')=1 AND json_extract(published, '$.image')=? LIMIT 1", (path,)).fetchone():
             abort(404)
         row = db().execute('SELECT body FROM images WHERE id=?', (image_id,)).fetchone()
         if not row:
@@ -341,9 +321,13 @@ def create_app(config=None):
     def admin():
         return send_from_directory(ROOT / 'admin', 'index.html')
 
+    @app.get('/account/')
+    def account_page():
+        return send_from_directory(ROOT / 'admin', 'account.html')
+
     @app.get('/<path:name>')
     def static_file(name):
-        if name in ('styles.css', 'app.js', 'catalog.js', 'entry-view.js', 'admin/admin.js', 'admin/admin.css') or (name.startswith('assets/') and '..' not in Path(name).parts):
+        if name in ('styles.css', 'app.js', 'catalog.js', 'entry-view.js', 'admin/admin.js', 'admin/admin.css', 'admin/account.html', 'admin/account.js', 'admin/users.html', 'admin/users.js') or (name.startswith('assets/') and '..' not in Path(name).parts):
             return send_from_directory(ROOT, name)
         abort(404)
 
