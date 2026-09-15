@@ -40,5 +40,6 @@
   up(e){if(!this.drag||this.drag.id!==e.pointerId)return;this.applyDrag();const d=this.drag;this.drag=null;if(this.frame){cancelAnimationFrame(this.frame);this.frame=null;}if(d.moved&&d.node)this.options.onMove?.(d.node);if(this.host.hasPointerCapture(e.pointerId))this.host.releasePointerCapture(e.pointerId);if(!d.moved&&d.node)this.pick(d.node.id);setTimeout(()=>{this.suppressClick=false;},0);}
   cancel(){if(this.frame)cancelAnimationFrame(this.frame);this.frame=null;if(this.drag?.node){this.drag.node.x=this.drag.x;this.drag.node.y=this.drag.y;this.drag.node.size=this.drag.size;this.position(this.drag.node);}this.drag=null;}
  }
- const api={Board,parents,canUnlock,prune,cyclic,size};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.SkillGraph=api;
+ function prepareAffinity(value){const graph=structuredClone(value);graph.path_name=graph.path_name||'Voie I';graph.role=graph.role||'';if(!graph.paths)graph.paths=['II','III'].map(n=>({name:graph.name,path_name:'Voie '+n,role:'',description:'',color:graph.color,symbol:'✦',image:null,nodes:[],edges:[]}));return graph;}
+ const api={prepareAffinity,Board,parents,canUnlock,prune,cyclic,size};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.SkillGraph=api;
 })(globalThis);

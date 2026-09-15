@@ -60,6 +60,21 @@ peuvent être partagées par les visiteurs. Les comptes sont inclus dans les sau
 ## Affinités et arbres de compétences
 
 Ouvrez **Atelier → Compétences** (`/admin/skills.html`), puis **Nouvelle Affinité**.
+Chaque Affinité possède trois voies indépendantes. Choisissez la voie à éditer dans
+la liste de l’atelier : son nom, son rôle, sa description, son illustration et son
+arbre se règlent séparément. Les changements de voie conservent le brouillon courant.
+L’enregistrement et la publication portent sur l’Affinité complète et ses trois voies.
+Les anciens arbres restent dans la première voie ; les deux suivantes démarrent vides.
+
+La page joueur s’ouvre sur le **Grimoire des Affinités** : un feuillet par Affinité,
+puis trois panneaux de spécialisation avant l’arbre plein écran. Les voies vides
+portent la mention « Arbre à venir ». Le joueur peut revenir aux voies ou au grimoire.
+Dans l’atelier, « Présentation dans le grimoire » permet d’ajouter un texte et une
+illustration propres à la classe ; à défaut, ceux de la première voie sont utilisés.
+Le feuilletage charge les résumés par lots de 20 et le contenu de l’Affinité consultée.
+Une seule voie est dessinée à la fois, avec une limite de 200 compétences et 600 liens
+par voie. Les images des trois voies restent protégées jusqu’à la publication.
+
 Le nom, la couleur, le symbole et l’illustration de fond personnalisent chaque arbre.
 Aucune classe ni compétence de démonstration n’est ajoutée à la campagne.
 

@@ -300,7 +300,7 @@ def create_app(config=None):
     @app.get('/api/images/<image_id>')
     def image(image_id):
         path = '/api/images/'+image_id
-        if session()['role'] != 'mj' and not db().execute("SELECT 1 FROM entries WHERE json_extract(published, '$.known')=1 AND json_extract(published, '$.image')=? LIMIT 1", (path,)).fetchone() and not db().execute("SELECT 1 FROM affinities WHERE published IS NOT NULL AND (json_extract(published,'$.image')=? OR EXISTS (SELECT 1 FROM json_each(json_extract(published,'$.nodes')) WHERE json_extract(value,'$.image')=?)) LIMIT 1", (path,path)).fetchone():
+        if session()['role'] != 'mj' and not db().execute("SELECT 1 FROM entries WHERE json_extract(published, '$.known')=1 AND json_extract(published, '$.image')=? LIMIT 1", (path,)).fetchone() and not db().execute("SELECT 1 FROM affinities WHERE published IS NOT NULL AND (json_extract(published,'$.cover')=? OR json_extract(published,'$.image')=? OR EXISTS (SELECT 1 FROM json_each(json_extract(published,'$.nodes')) WHERE json_extract(value,'$.image')=?) OR EXISTS (SELECT 1 FROM json_each(json_extract(published,'$.paths')) AS branch WHERE json_extract(branch.value,'$.image')=? OR EXISTS (SELECT 1 FROM json_each(json_extract(branch.value,'$.nodes')) AS node WHERE json_extract(node.value,'$.image')=?))) LIMIT 1", (path,path,path,path,path)).fetchone():
             abort(404)
         row = db().execute('SELECT body FROM images WHERE id=?', (image_id,)).fetchone()
         if not row:

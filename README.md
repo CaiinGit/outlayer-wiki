@@ -27,6 +27,7 @@ les fichiers montés par Nginx et conserve les volumes de données.
 
 - Chronologie sur `/chronologie/` : frise verticale animée, recherche, ères et événements.
 - Compétences sur `/competences/` : choix d’Affinité, arbres interactifs, fiches détaillées et simulation locale des prérequis.
+- Grimoire à feuilleter : une Affinité par feuillet, puis trois voies illustrées avec leurs propres arbres, configurables dans l’atelier.
 - Atelier Compétences : glisser-déposer, liens dirigés, règles « tous » ou « au moins un », icônes et fonds personnalisés, brouillons et publication indépendante.
 - Atelier Chronologie : dates négatives ou inconnues, récits, ordre, import JSON privé et révélation aux joueurs.
 

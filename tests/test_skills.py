@@ -73,6 +73,36 @@ class SkillsTests(test_server.ServerTests):
             graph['nodes'][0]['size']=size
             self.assertEqual(self.change('/api/admin/affinities',graph).status_code,400)
 
+    def test_three_independent_paths_and_publication(self):
+        graph=self.graph();graph['paths']=[dict(self.graph(),path_name='Deux',role='Soutien'),dict(self.graph(),path_name='Trois')]
+        row=self.create_tree(graph);path='/api/admin/affinities/'+row['id'];public='/api/affinities/'+row['id']
+        self.assertEqual(self.player.get(public).status_code,404)
+        row=self.change(path+'/publish',dict(revision=row['revision'])).json
+        self.assertEqual(self.player.get(public).json['tree']['paths'][0]['role'],'Soutien')
+        graph['paths'][0]['nodes'][0]['name']='Brouillon secret'
+        self.assertEqual(self.change(path,dict(tree=graph,revision=row['revision']),'PUT').status_code,200)
+        self.assertEqual(self.player.get(public).json['tree']['paths'][0]['nodes'][0]['name'],'Racine')
+        for branches in [[],[self.graph()], [self.graph()]*3, [dict(self.graph(),paths=[]),self.graph()]]:
+            self.assertEqual(self.change('/api/admin/affinities',dict(self.graph(),paths=branches)).status_code,400)
+        graph['paths'][0]['edges']=[{'from':'a','to':'missing-in-this-path'}]
+        self.assertEqual(self.change('/api/admin/affinities',graph).status_code,400)
+
+    def test_path_and_cover_images_remain_private_until_publication(self):
+        image=io.BytesIO();Image.new('RGB',(80,80),'blue').save(image,'PNG');image.seek(0)
+        result=self.mj.post('/api/admin/images',data={'image':(image,'branch.png')},headers={'Origin':'http://localhost','X-CSRF-Token':self.csrf})
+        url=result.json['image']
+        graph=self.graph();graph['paths']=[self.graph(),self.graph()];graph['paths'][1]['nodes'][0]['image']=url
+        row=self.create_tree(graph);path='/api/admin/affinities/'+row['id']
+        self.assertEqual(self.player.get(url).status_code,404)
+        row=self.change(path+'/publish',dict(revision=row['revision'])).json
+        self.assertEqual(self.player.get(url).status_code,200)
+        row=self.change(path+'/hide',dict(revision=row['revision'])).json
+        self.assertEqual(self.player.get(url).status_code,404)
+        graph=self.graph();graph['cover']=url;graph['lore']='Présentation du grimoire'
+        row=self.change(path,dict(tree=graph,revision=row['revision']),'PUT').json
+        self.change(path+'/publish',dict(revision=row['revision']))
+        self.assertEqual(self.player.get(url).status_code,200)
+
 
 for name in dir(test_server.ServerTests):
     if name.startswith('test_'):setattr(SkillsTests,name,None)

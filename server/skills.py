@@ -13,7 +13,7 @@ def migrate_skills(db):
     db.execute('CREATE TABLE IF NOT EXISTS affinities (id TEXT PRIMARY KEY, draft TEXT NOT NULL, published TEXT, revision INTEGER NOT NULL DEFAULT 1, updated_at TEXT NOT NULL)')
 
 
-def validate_graph(value,db):
+def validate_graph(value,db,branch=False):
     def text(source,key,limit,default=''):
         v=source.get(key,default)
         if not isinstance(v,str) or len(v)>limit:abort(400,description='Champ invalide : '+key)
@@ -67,7 +67,11 @@ def validate_graph(value,db):
             degree[child]-=1
             if degree[child]==0:queue.append(child)
     if visited!=len(ids):abort(400,description='Ce lien crée une boucle de prérequis. L’arbre doit pouvoir être débloqué depuis ses racines.')
-    return dict(name=name,description=text(value,'description',5000),color=color,symbol=text(value,'symbol',8,'✦'),image=image(value),nodes=clean,edges=links)
+    extra={}
+    if 'paths' in value:
+        if branch or not isinstance(value['paths'],list) or len(value['paths'])!=2:abort(400,description='Une Affinité possède exactement trois voies.')
+        extra['paths']=[validate_graph(item,db,True) for item in value['paths']]
+    return dict(lore=text(value,'lore',5000),cover=image({'image':value.get('cover')}),path_name=text(value,'path_name',120,'Voie I'),role=text(value,'role',120),**extra,name=name,description=text(value,'description',5000),color=color,symbol=text(value,'symbol',8,'✦'),image=image(value),nodes=clean,edges=links)
 
 
 def register_skills(app,db,private,payload):
