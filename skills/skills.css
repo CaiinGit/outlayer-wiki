@@ -127,7 +127,7 @@
 .grimoire-heading { text-align:center; margin:0 auto 24px; }
 .grimoire-heading>p,.specialization-stage header>p:first-of-type { color:#bda36c; font:10px/1.5 Arial,sans-serif; letter-spacing:.3em; margin:8px 0; }
 .grimoire-heading h1,.specialization-stage h1 { font:400 clamp(26px,3vw,42px)/1.2 Georgia,serif; color:#ecdfbf; margin:8px 0; }
-.grimoire-heading h1,.specialization-stage h1 { max-width:none; }
+.grimoire-heading h1,.specialization-stage h1 { max-width:none; overflow-wrap:anywhere; }
 .grimoire-admin { padding:16px; margin-bottom:18px; border:1px solid #80704a55; }
 .grimoire-admin textarea { max-width:700px; }
 .grimoire-heading a { font:11px Arial,sans-serif; color:#c4ac79; }
@@ -150,8 +150,8 @@
 .book-navigation button { color:#dac493; background:#17191ccc; border:1px solid #9a7e4944; padding:12px 18px; cursor:pointer; font:inherit; }
 .book-navigation button:disabled { opacity:.35; cursor:default; }
 .specialization-stage { padding:28px max(4vw,20px); }
-.specialization-stage header { text-align:center; margin-bottom:28px; }
-.specialization-stage header>button { float:left; }
+.specialization-stage header { display:grid; grid-template-columns:minmax(0,1fr); text-align:center; margin-bottom:28px; }
+.specialization-stage header>button { justify-self:start; margin-bottom:8px; }
 .specialization-stage header>p { color:#a5a396; font-size:13px; }
 .specialization-cards { max-width:1200px; margin:0 auto 24px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
 .specialization-card { position:relative; padding:24px; min-height:480px; display:flex; align-items:center; flex-direction:column; text-align:center; border:1px solid #77613d; background:linear-gradient(#293135bb,#121617f5 58%); box-shadow:inset 0 0 0 4px #090d0f77,0 12px 28px #0006; transition:border-color .2s,background .2s; }
@@ -170,5 +170,5 @@
 .specialization-action { width:100%; padding:12px; border:1px solid #ab854d; background:linear-gradient(#693023,#3b1b15); color:#ecd4a1; font:13px Georgia,serif; cursor:pointer; }
 .specialization-action:disabled { background:#1c2020; color:#827d6c; border-color:#514c3e; cursor:default; }
 .tree-navigation { top:16px; left:16px; padding:6px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-@media(max-width:700px) { .grimoire-stage { padding:18px 16px; } .grimoire-book { grid-template-columns:1fr; } .grimoire-book:after { display:none; } .book-portrait { min-height:145px; } .book-sigil { width:75px; height:75px; font-size:42px; outline-offset:6px; } .book-engraving { display:none; } .book-leaf { padding:24px 25px 36px; } .book-navigation button { padding:10px; font-size:11px; } .specialization-cards { grid-template-columns:1fr; } .specialization-card { min-height:0; } .specialization-stage header>button { float:none; margin-bottom:15px; } .specialization-art { height:190px; } }
+@media(max-width:700px) { .grimoire-stage { padding:18px 16px; } .grimoire-book { grid-template-columns:1fr; } .grimoire-book:after { display:none; } .book-portrait { min-height:145px; } .book-sigil { width:75px; height:75px; font-size:42px; outline-offset:6px; } .book-engraving { display:none; } .book-leaf { padding:24px 25px 36px; } .book-navigation button { padding:10px; font-size:11px; } .specialization-cards { grid-template-columns:1fr; } .specialization-card { min-height:0; } .specialization-stage header>button { justify-self:center; margin-bottom:15px; } .specialization-art { height:190px; } }
 @media(prefers-reduced-motion:reduce) { .specialization-card { transition:none; } }
