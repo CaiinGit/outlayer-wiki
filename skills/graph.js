@@ -24,7 +24,8 @@
     this.nodes.append(button);this.buttons.set(node.id,button);
    }this.drawEdges();this.states();this.transform();
   }
-  path(edge){const a=this.tree.nodes.find(n=>n.id===edge.from),b=this.tree.nodes.find(n=>n.id===edge.to);if(!a||!b)return '';return `M ${a.x} ${a.y+diameter(a)/2} C ${a.x} ${a.y+diameter(a)/2+58}, ${b.x} ${b.y-diameter(b)/2-58}, ${b.x} ${b.y-diameter(b)/2-5}`;}
+  path(edge){const a=this.tree.nodes.find(n=>n.id===edge.from),b=this.tree.nodes.find(n=>n.id===edge.to);if(!a||!b)return '';const dx=b.x-a.x,dy=b.y-a.y,length=Math.hypot(dx,dy);if(!length)return '';const ux=dx/length,uy=dy/length;const boundary=n=>diameter(n)/2/(n.kind==='passive'?1:Math.max(Math.abs(ux),Math.abs(uy)));const start=boundary(a),end=boundary(b)+5;if(start+end>=length)return '';return `M ${a.x+ux*start} ${a.y+uy*start} L ${b.x-ux*end} ${b.y-uy*end}`;}
+
   drawEdges(){this.svg.replaceChildren();this.paths=[];const ns='http://www.w3.org/2000/svg',defs=document.createElementNS(ns,'defs'),marker=document.createElementNS(ns,'marker');marker.id='tree-arrow';marker.setAttribute('viewBox','0 0 10 10');marker.setAttribute('refX','9');marker.setAttribute('refY','5');marker.setAttribute('markerWidth','5');marker.setAttribute('markerHeight','5');marker.setAttribute('orient','auto');const arrow=document.createElementNS(ns,'path');arrow.setAttribute('d','M 0 0 L 10 5 L 0 10 z');arrow.setAttribute('fill','#b79b65');marker.append(arrow);defs.append(marker);this.svg.append(defs);
    for(const edge of this.tree.edges){const path=document.createElementNS(ns,'path');path.setAttribute('d',this.path(edge));path.setAttribute('marker-end','url(#tree-arrow)');this.svg.append(path);this.paths.push({edge,path});}
   }
